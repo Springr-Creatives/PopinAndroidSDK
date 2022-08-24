@@ -16,16 +16,15 @@ import to.popin.androidsdk.models.TalkModel;
 
 public class CallPresenter implements LifecycleObserver {
     private final CallInteractor callInteractor;
-    private final CallRepository callRepository;
+
     private final Context context;
     private final Device device;
     private final MainThreadBus mainThreadBus;
     private CallActivityView callActivityView;
     private int call_id;
-    public CallPresenter(Context context, CallActivityView callActivityView, CallInteractor callInteractor, CallRepository callRepository, Device device, MainThreadBus mainThreadBus) {
+    public CallPresenter(Context context, CallActivityView callActivityView, CallInteractor callInteractor, Device device, MainThreadBus mainThreadBus) {
         this.callActivityView = callActivityView;
         this.callInteractor = callInteractor;
-        this.callRepository = callRepository;
         this.context = context;
         this.device = device;
         this.mainThreadBus = mainThreadBus;
@@ -87,12 +86,9 @@ public class CallPresenter implements LifecycleObserver {
         });
     }
 
-    public void attendCall() {
-        callRepository.markCallAttended(call_id);
-    }
+
 
     public void disconnectCall() {
-        callRepository.markCallEnded(call_id);
         callInteractor.disconnectCall(call_id, () -> {
             if (callActivityView != null) {
                 callActivityView.closeActivity();

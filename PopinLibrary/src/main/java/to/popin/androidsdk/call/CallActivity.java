@@ -14,14 +14,12 @@ import android.util.Rational;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.widget.AppCompatSeekBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 
@@ -49,28 +47,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import dagger.android.support.DaggerAppCompatActivity;
 import to.popin.androidsdk.BuildConfig;
 import to.popin.androidsdk.R;
 import to.popin.androidsdk.R2;
 import to.popin.androidsdk.common.Analytics;
 import to.popin.androidsdk.common.Device;
+import to.popin.androidsdk.common.MainThreadBus;
 import tvi.webrtc.VideoSink;
 
 
-public class CallActivity extends DaggerAppCompatActivity implements CallActivityView {
-
-    @Inject
-    CallPresenter callPresenter;
-
-
-    @Inject
-    Device device;
+public class CallActivity extends AppCompatActivity implements CallActivityView {
 
 
     @BindView(R2.id.primary_video_view)
@@ -124,6 +113,8 @@ public class CallActivity extends DaggerAppCompatActivity implements CallActivit
     private int call_id;
     private boolean mutedAudio = false, mutedVideo = false, remoteParticipantPresent = false;
 
+    private CallPresenter callPresenter;
+    private Device device;
 
     public static int pxToDp(int px) {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
@@ -137,6 +128,8 @@ public class CallActivity extends DaggerAppCompatActivity implements CallActivit
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R2.layout.activity_call);
+        device = new Device(this);
+        callPresenter = new CallPresenter(this, this, new CallInteractor(this,device ), device, new MainThreadBus());
         ButterKnife.bind(this);
         analytics = new Analytics();
         if (BuildConfig.DEBUG) {
@@ -245,7 +238,6 @@ public class CallActivity extends DaggerAppCompatActivity implements CallActivit
         }
 
 
-
         initializeUI();
 
     }
@@ -327,12 +319,11 @@ public class CallActivity extends DaggerAppCompatActivity implements CallActivit
 
     private void setDisconnectAction() {
         connectActionFab.setImageDrawable(
-                ContextCompat.getDrawable(this, R2.drawable.ic_call_end_white_24px));
+                ContextCompat.getDrawable(this, R.drawable.ic_call_end_white_24px));
         connectActionFab.show();
     }
 
     private void addRemoteParticipant(RemoteParticipant remoteParticipant) {
-        callPresenter.attendCall();
         if (thumbnailVideoView.getVisibility() == View.VISIBLE) {
             //Multiple participants are not currently support in this UI
             Toast.makeText(this, "Multiple participants error", Toast.LENGTH_LONG).show();
@@ -451,10 +442,10 @@ public class CallActivity extends DaggerAppCompatActivity implements CallActivit
             mutedVideo = !enable;
             int icon;
             if (enable) {
-                icon = R2.drawable.ic_videocam_white_24dp;
+                icon = R.drawable.ic_videocam_white_24dp;
                 switchCameraActionFab.show();
             } else {
-                icon = R2.drawable.ic_camera_off;
+                icon = R.drawable.ic_camera_off;
                 switchCameraActionFab.hide();
             }
             localVideoActionFab.setImageDrawable(ContextCompat.getDrawable(CallActivity.this, icon));
@@ -466,7 +457,7 @@ public class CallActivity extends DaggerAppCompatActivity implements CallActivit
         analytics.logEvent("popin_in_call_mute_audio", "call_id", call_id);
         callLocalTrackManager.toggleMute(enable -> {
             mutedAudio = !enable;
-            int icon = enable ? R2.drawable.ic_mic_white_24dp : R2.drawable.ic_mic_off;
+            int icon = enable ? R.drawable.ic_mic_white_24dp : R.drawable.ic_mic_off;
             muteActionFab.setImageDrawable(ContextCompat.getDrawable(CallActivity.this, icon));
         });
     }
@@ -556,7 +547,6 @@ public class CallActivity extends DaggerAppCompatActivity implements CallActivit
             localVideoActionFab.hide();
             connectActionFab.hide();
             chatFab.hide();
-
 
 
         } else {

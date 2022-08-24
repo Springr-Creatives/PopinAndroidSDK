@@ -13,6 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PopinLibraryDemo"
         tools:targetApi="31">
+        <meta-data
+            android:name="to.popin.androidsdk.POPIN_TOKEN"
+            android:value="11456" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         buttonCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Popin.initialize();
+                Popin.initialize(MainActivity.this);
             }
         });
 

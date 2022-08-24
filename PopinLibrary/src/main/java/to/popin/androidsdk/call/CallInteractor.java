@@ -1,14 +1,21 @@
 package to.popin.androidsdk.call;
 
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.chuckerteam.chucker.api.ChuckerInterceptor;
+
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import to.popin.androidsdk.common.APIInterface;
+import to.popin.androidsdk.common.AuthInterceptor;
 import to.popin.androidsdk.common.Device;
 import to.popin.androidsdk.models.StatusModel;
 import to.popin.androidsdk.models.TalkModel;
@@ -17,9 +24,16 @@ public class CallInteractor {
     private final Device myPhone;
     private final APIInterface apiInterface;
 
-    public CallInteractor(Device myPhone, APIInterface apiInterface) {
+
+    public CallInteractor(Context context, Device myPhone) {
         this.myPhone = myPhone;
-        this.apiInterface = apiInterface;
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(new ChuckerInterceptor(context)).addInterceptor(new AuthInterceptor(myPhone));
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://test.popin.to/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+        this.apiInterface = retrofit.create(APIInterface.class);
     }
 
     public void getAccessToken(int call_id, AccessTokenListener accessTokenListener) {
