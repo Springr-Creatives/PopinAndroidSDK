@@ -11,4 +11,7 @@ public class UserModel {
 
     @SerializedName("token")
     public String token;
+
+    @SerializedName("channel")
+    public String channel;
 }

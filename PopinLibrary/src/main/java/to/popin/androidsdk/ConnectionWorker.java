@@ -1,4 +1,4 @@
-package to.popin.androidsdk.session;
+package to.popin.androidsdk;
 
 import android.content.Context;
 import android.util.Log;
@@ -15,13 +15,15 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import to.popin.androidsdk.common.APIInterface;
 import to.popin.androidsdk.common.Device;
+import to.popin.androidsdk.models.StatusModel;
 import to.popin.androidsdk.models.UserModel;
 
-public class PopinSessionInteractor {
+public class ConnectionWorker {
+
     private final Device myPhone;
     private final APIInterface apiInterface;
 
-    public PopinSessionInteractor(Context context, Device myPhone) {
+    public ConnectionWorker(Context context , Device myPhone, APIInterface apiInterface) {
         this.myPhone = myPhone;
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(new ChuckerInterceptor(context));
         Retrofit retrofit = new Retrofit.Builder()
@@ -32,28 +34,26 @@ public class PopinSessionInteractor {
         this.apiInterface = retrofit.create(APIInterface.class);
     }
 
-    public void registerForToken(int seller) {
-        Call<UserModel> call = apiInterface.registerUser(seller, 1, "Test Device");
-        call.enqueue(new Callback<UserModel>() {
+
+    public void startConnection() {
+        Call<StatusModel> call = apiInterface.startConnection(myPhone.getSeller());
+        call.enqueue(new Callback<StatusModel>() {
             @Override
-            public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {
+            public void onResponse(@NonNull Call<StatusModel> call, @NonNull Response<StatusModel> response) {
                 if (response.code() == 200) {
-                    UserModel userModel = response.body();
-                    if (userModel != null && userModel.status == 1) {
-                        myPhone.saveToken(userModel.token);
-                        myPhone.saveChannel(userModel.channel);
+                    StatusModel statusModel = response.body();
+                    if (statusModel != null && statusModel.status == 1) {
                         return;
                     }
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<UserModel> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<StatusModel> call, @NonNull Throwable t) {
                 Log.e("ERR", t.getMessage());
 
             }
         });
     }
-
 
 }

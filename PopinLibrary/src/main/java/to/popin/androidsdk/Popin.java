@@ -3,16 +3,33 @@ package to.popin.androidsdk;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.widget.Toast;
 
 import to.popin.androidsdk.common.Device;
+import to.popin.androidsdk.common.MainThreadBus;
 import to.popin.androidsdk.session.PopinSession;
 
 public class Popin {
 
-    private static PopinSession popinSession;
+    private PopinSession popinSession;
+    private PusherWorker pusherWorker;
+    private ConnectionWorker connectionWorker;
+    private PopinEventsListener popinEventsListener;
+    private MainThreadBus mainThreadBus;
+    private static Popin popin;
 
-    public static void initialize(Context context) {
+    public static synchronized Popin initialize(Context context) {
+        if (popin == null) {
+            popin = new Popin(context);
+        }
+        return popin;
+    }
+
+    public static Popin getInstance() {
+        return popin;
+    }
+
+
+    public Popin(Context context) {
         try {
             Device device = new Device(context);
             ApplicationInfo applicationInfo = context.getPackageManager()
@@ -20,16 +37,24 @@ public class Popin {
             if (applicationInfo != null) {
                 int apiKey = applicationInfo.metaData.getInt("to.popin.androidsdk.POPIN_TOKEN");
                 device.setSeller(apiKey);
+                mainThreadBus = new MainThreadBus();
                 popinSession = new PopinSession(context, device);
                 popinSession.updateSession();
+
             }
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    public static void startCall(PopinEventsListener popinEventsListener) {
+    public void startConnection(PopinEventsListener popinEventsListener) {
+        this.popinEventsListener = popinEventsListener;
+        pusherWorker = new PusherWorker(popinSession.getContext(), popinSession.getDevice(), () -> connectionWorker.startConnection(), popinEventsListener);
 
+    }
+
+
+    public static void startCall(PopinEventsListener popinEventsListener) {
 
     }
 }

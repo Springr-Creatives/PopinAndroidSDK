@@ -20,6 +20,12 @@ public interface APIInterface {
     );
 
     @FormUrlEncoded
+    @POST("v1/user/connect")
+    Call<StatusModel> startConnection(
+            @Field("seller_id") int seller_id
+    );
+
+    @FormUrlEncoded
     @POST("v1/user/call/details")
     Call<TalkModel> getCallAccessToken(
             @Field("call_id") int call_id

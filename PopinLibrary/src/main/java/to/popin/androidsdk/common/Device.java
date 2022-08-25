@@ -29,4 +29,14 @@ public class Device {
         editor.putString("token", token);
         editor.apply();
     }
+
+    public String getChannel() {
+        return settings.getString("channel", "");
+    }
+
+    public void saveChannel(String channel) {
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("channel", channel);
+        editor.apply();
+    }
 }
