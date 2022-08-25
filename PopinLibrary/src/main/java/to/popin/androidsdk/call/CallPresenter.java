@@ -57,12 +57,12 @@ public class CallPresenter implements LifecycleObserver {
         callActivityView.connectRoom(liveModel.room);
     }
 
-    public void getAccessToken(int _call_id) {
-        call_id = _call_id;
-        callInteractor.getAccessToken(call_id, new CallInteractor.AccessTokenListener() {
+    public void getAccessToken() {
+        callInteractor.getAccessToken( new CallInteractor.AccessTokenListener() {
             @Override
             public void onAccessToken(TalkModel talkModel) {
                 if (callActivityView != null) {
+                    call_id = talkModel.id;
                     callActivityView.setAccessToken(talkModel.access_token);
                     callActivityView.connectRoom(talkModel.room);
                 }

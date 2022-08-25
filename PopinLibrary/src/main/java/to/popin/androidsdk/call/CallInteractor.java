@@ -36,15 +36,15 @@ public class CallInteractor {
         this.apiInterface = retrofit.create(APIInterface.class);
     }
 
-    public void getAccessToken(int call_id, AccessTokenListener accessTokenListener) {
-        Call<TalkModel> call = apiInterface.getCallAccessToken(call_id);
+    public void getAccessToken(AccessTokenListener accessTokenListener) {
+        Call<TalkModel> call = apiInterface.createCall("AS");
         call.enqueue(new Callback<TalkModel>() {
             @Override
             public void onResponse(@NonNull Call<TalkModel> call, @NonNull Response<TalkModel> response) {
                 if (response.code() == 200) {
                     TalkModel talkModel = response.body();
                     if (talkModel != null) {
-                        if (talkModel.status == 0 || talkModel.status == 1) {
+                        if (talkModel.status == 1) {
                             accessTokenListener.onAccessToken(talkModel);
                         } else {
                             accessTokenListener.onInvalidCall(talkModel.status);

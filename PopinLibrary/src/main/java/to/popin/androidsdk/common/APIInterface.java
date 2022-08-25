@@ -26,9 +26,9 @@ public interface APIInterface {
     );
 
     @FormUrlEncoded
-    @POST("v1/user/call/details")
-    Call<TalkModel> getCallAccessToken(
-            @Field("call_id") int call_id
+    @POST("v1/user/call")
+    Call<TalkModel> createCall(
+            @Field("nonce") String nonce
     );
 
     @FormUrlEncoded

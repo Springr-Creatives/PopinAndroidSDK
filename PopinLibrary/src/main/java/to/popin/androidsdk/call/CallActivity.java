@@ -127,7 +127,7 @@ public class CallActivity extends AppCompatActivity implements CallActivityView 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R2.layout.activity_call);
+        setContentView(R.layout.activity_call);
         device = new Device(this);
         callPresenter = new CallPresenter(this, this, new CallInteractor(this,device ), device, new MainThreadBus());
         ButterKnife.bind(this);
@@ -231,13 +231,9 @@ public class CallActivity extends AppCompatActivity implements CallActivityView 
             finish();
         } else {
             createAudioAndVideoTracks();
-
             analytics.logEvent("popin_in_call_start", "call_id", call_id);
-            callPresenter.getAccessToken(getIntent().getIntExtra("CALL_ID", 0));
-
+            callPresenter.getAccessToken();
         }
-
-
         initializeUI();
 
     }

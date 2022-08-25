@@ -17,14 +17,12 @@ import to.popin.androidsdk.common.APIInterface;
 import to.popin.androidsdk.common.AuthInterceptor;
 import to.popin.androidsdk.common.Device;
 import to.popin.androidsdk.models.StatusModel;
-import to.popin.androidsdk.models.UserModel;
 
-public class ConnectionWorker {
-
+public class CallWorker {
     private final Device myPhone;
     private final APIInterface apiInterface;
 
-    public ConnectionWorker(Context context , Device myPhone) {
+    public CallWorker(Context context, Device myPhone) {
         this.myPhone = myPhone;
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(new ChuckerInterceptor(context)).addInterceptor(new AuthInterceptor(myPhone));
         Retrofit retrofit = new Retrofit.Builder()
@@ -35,8 +33,7 @@ public class ConnectionWorker {
         this.apiInterface = retrofit.create(APIInterface.class);
     }
 
-
-    public void startConnection() {
+    public void createCall() {
         Call<StatusModel> call = apiInterface.startConnection(myPhone.getSeller());
         call.enqueue(new Callback<StatusModel>() {
             @Override
@@ -56,5 +53,4 @@ public class ConnectionWorker {
             }
         });
     }
-
 }
