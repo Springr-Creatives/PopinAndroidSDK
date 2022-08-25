@@ -28,7 +28,7 @@ public interface APIInterface {
     @FormUrlEncoded
     @POST("v1/user/call")
     Call<TalkModel> createCall(
-            @Field("nonce") String nonce
+            @Field("seller_id") int seller_id
     );
 
     @FormUrlEncoded

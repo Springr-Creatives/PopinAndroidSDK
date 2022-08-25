@@ -37,7 +37,7 @@ public class CallInteractor {
     }
 
     public void getAccessToken(AccessTokenListener accessTokenListener) {
-        Call<TalkModel> call = apiInterface.createCall("AS");
+        Call<TalkModel> call = apiInterface.createCall(myPhone.getSeller());
         call.enqueue(new Callback<TalkModel>() {
             @Override
             public void onResponse(@NonNull Call<TalkModel> call, @NonNull Response<TalkModel> response) {

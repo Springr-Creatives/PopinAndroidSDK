@@ -7,17 +7,20 @@ public class Device {
     private final Context context;
     private final SharedPreferences settings;
     private int seller;
+
     public Device(Context context) {
         this.context = context;
         this.settings = context.getSharedPreferences("POPIN_CALL", Context.MODE_PRIVATE);
     }
 
     public void setSeller(int seller) {
-        this.seller = seller;
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt("seller_id", seller);
+        editor.apply();
     }
 
     public int getSeller() {
-        return seller;
+        return settings.getInt("seller_id", 0);
     }
 
     public String getToken() {
