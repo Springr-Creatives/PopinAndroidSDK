@@ -5,7 +5,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.chuckerteam.chucker.api.ChuckerInterceptor;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -24,7 +23,7 @@ public class CallWorker {
 
     public CallWorker(Context context, Device myPhone) {
         this.myPhone = myPhone;
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(new ChuckerInterceptor(context)).addInterceptor(new AuthInterceptor(myPhone));
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(new AuthInterceptor(myPhone));
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://test.popin.to/api/")
                 .addConverterFactory(GsonConverterFactory.create())

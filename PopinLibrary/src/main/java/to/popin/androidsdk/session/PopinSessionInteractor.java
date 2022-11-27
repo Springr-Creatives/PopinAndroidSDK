@@ -5,7 +5,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.chuckerteam.chucker.api.ChuckerInterceptor;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -23,7 +22,7 @@ public class PopinSessionInteractor {
 
     public PopinSessionInteractor(Context context, Device myPhone) {
         this.myPhone = myPhone;
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(new ChuckerInterceptor(context));
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://test.popin.to/api/")
                 .addConverterFactory(GsonConverterFactory.create())

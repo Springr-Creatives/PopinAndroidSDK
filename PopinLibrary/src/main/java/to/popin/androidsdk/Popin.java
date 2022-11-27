@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import to.popin.androidsdk.common.Device;
 import to.popin.androidsdk.common.MainThreadBus;
@@ -18,7 +19,7 @@ public class Popin {
     private MainThreadBus mainThreadBus;
     private static Popin popin;
 
-    public static synchronized Popin initialize(Context context) {
+    public static synchronized Popin init(Context context) {
         if (popin == null) {
             popin = new Popin(context);
         }
@@ -26,6 +27,10 @@ public class Popin {
     }
 
     public static Popin getInstance() {
+        if (popin == null) {
+            Log.e("Exception", "PopinSDK Not Initialised");
+            throw new RuntimeException("PopinSDK Not Initialised");
+        }
         return popin;
     }
 

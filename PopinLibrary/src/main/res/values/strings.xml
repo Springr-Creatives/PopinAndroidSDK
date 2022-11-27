@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">PopinLibraryDemo</string>
-    <string name="server_url">https://test.popin.to</string>
+    <string name="server_url">https://dev.popin.to</string>
     <string name="pusher_key">b6cb0f549999df3d07a9</string>
 </resources>

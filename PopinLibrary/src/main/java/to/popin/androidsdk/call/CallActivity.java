@@ -47,12 +47,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import to.popin.androidsdk.BuildConfig;
 import to.popin.androidsdk.R;
-import to.popin.androidsdk.R2;
 import to.popin.androidsdk.common.Analytics;
 import to.popin.androidsdk.common.Device;
 import to.popin.androidsdk.common.MainThreadBus;
@@ -62,31 +58,15 @@ import tvi.webrtc.VideoSink;
 public class CallActivity extends AppCompatActivity implements CallActivityView {
 
 
-    @BindView(R2.id.primary_video_view)
+
     VideoView primaryVideoView;
-
-    @BindView(R2.id.thumbnail_video_view)
     VideoView thumbnailVideoView;
-
-    @BindView(R2.id.lytWaiting)
     LinearLayout lytWaiting;
-
-    @BindView(R2.id.connect_action_fab)
     FloatingActionButton connectActionFab;
-
-    @BindView(R2.id.switch_camera_action_fab)
     FloatingActionButton switchCameraActionFab;
-
-    @BindView(R2.id.local_video_action_fab)
     FloatingActionButton localVideoActionFab;
-
-    @BindView(R2.id.mute_action_fab)
     FloatingActionButton muteActionFab;
-
-    @BindView(R2.id.action_chat)
     FloatingActionButton chatFab;
-
-    @BindView(R2.id.textTrackDisabled)
     TextView textTrackDisabled;
 
 
@@ -130,7 +110,7 @@ public class CallActivity extends AppCompatActivity implements CallActivityView 
         setContentView(R.layout.activity_call);
         device = new Device(this);
         callPresenter = new CallPresenter(this, this, new CallInteractor(this,device ), device, new MainThreadBus());
-        ButterKnife.bind(this);
+        loadViews();
         analytics = new Analytics();
         if (BuildConfig.DEBUG) {
             Video.setLogLevel(LogLevel.DEBUG);
@@ -252,6 +232,105 @@ public class CallActivity extends AppCompatActivity implements CallActivityView 
                     && resultMic == PackageManager.PERMISSION_GRANTED;
         }
     }
+
+    private void loadViews() {
+        primaryVideoView = findViewById(R.id.primary_video_view);
+        thumbnailVideoView= findViewById(R.id.thumbnail_video_view);
+        lytWaiting= findViewById(R.id.lytWaiting);
+        connectActionFab= findViewById(R.id.connect_action_fab);
+        switchCameraActionFab= findViewById(R.id.switch_camera_action_fab);
+        localVideoActionFab= findViewById(R.id.local_video_action_fab);
+        muteActionFab= findViewById(R.id.mute_action_fab);
+        chatFab= findViewById(R.id.action_chat);
+        textTrackDisabled= findViewById(R.id.textTrackDisabled);
+
+        connectActionFab.setOnClickListener(view -> {
+            analytics.logEvent("popin_in_call_disconnect_click", "call_id", call_id);
+            if (room != null) {
+                room.disconnect();
+                finish();
+            }
+            callPresenter.disconnectCall();
+        });
+
+        switchCameraActionFab.setOnClickListener(view -> {
+            analytics.logEvent("popin_in_call_switch_camera", "call_id", call_id);
+            callLocalTrackManager.switchCamera(isFrontCamera -> {
+                isUsingFrontCamera = !isUsingFrontCamera;
+                if (localIsInPrimary) {
+                    primaryVideoView.setMirror(isUsingFrontCamera);
+                    thumbnailVideoView.setMirror(false);
+                } else {
+                    primaryVideoView.setMirror(false);
+                    thumbnailVideoView.setMirror(isUsingFrontCamera);
+                }
+            });
+        });
+
+        localVideoActionFab.setOnClickListener(view -> {
+            analytics.logEvent("popin_in_call_toggle_camera", "call_id", call_id);
+            callLocalTrackManager.toggleCamera(enable -> {
+                mutedVideo = !enable;
+                int icon;
+                if (enable) {
+                    icon = R.drawable.ic_videocam_white_24dp;
+                    switchCameraActionFab.show();
+                } else {
+                    icon = R.drawable.ic_camera_off;
+                    switchCameraActionFab.hide();
+                }
+                localVideoActionFab.setImageDrawable(ContextCompat.getDrawable(CallActivity.this, icon));
+            });
+        });
+
+        muteActionFab.setOnClickListener(view -> {
+            analytics.logEvent("popin_in_call_mute_audio", "call_id", call_id);
+            callLocalTrackManager.toggleMute(enable -> {
+                mutedAudio = !enable;
+                int icon = enable ? R.drawable.ic_mic_white_24dp : R.drawable.ic_mic_off;
+                muteActionFab.setImageDrawable(ContextCompat.getDrawable(CallActivity.this, icon));
+            });
+        });
+
+        thumbnailVideoView.setOnClickListener(view -> {
+            analytics.logEvent("popin_in_call_interchange_primary", "call_id", call_id);
+            if (!isThumbnailClicked) {
+                //move local to primary
+                localIsInPrimary = true;
+                callLocalTrackManager.changeVideoSink(thumbnailVideoView, primaryVideoView);
+                localVideoSink = primaryVideoView;
+                if (remoteVideoTrack != null) {
+                    primaryVideoView.setMirror(isUsingFrontCamera);
+                    thumbnailVideoView.setMirror(false);
+                    remoteVideoTrack.removeSink(primaryVideoView);
+                    remoteVideoTrack.addSink(thumbnailVideoView);
+                }
+
+            } else {
+                //move local to thumbnail
+                localIsInPrimary = false;
+                callLocalTrackManager.changeVideoSink(primaryVideoView, thumbnailVideoView);
+                if (remoteVideoTrack != null) {
+                    //move remote to primary
+                    primaryVideoView.setMirror(false);
+                    thumbnailVideoView.setMirror(isUsingFrontCamera);
+                    primaryVideoView.setMirror(false);
+                    remoteVideoTrack.removeSink(thumbnailVideoView);
+                    remoteVideoTrack.addSink(primaryVideoView);
+                }
+            }
+
+            isThumbnailClicked = !isThumbnailClicked;
+        });
+
+        chatFab.setOnClickListener(view -> {
+            analytics.logEvent("popin_in_call_pip", "call_id", call_id);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                enterPip();
+            }
+        });
+    }
+
 
     @Override
     protected void onResume() {
@@ -385,109 +464,6 @@ public class CallActivity extends AppCompatActivity implements CallActivityView 
                 primaryVideoView.setMirror(true);
             }
         }
-    }
-
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @OnClick(R2.id.action_chat)
-    void chatButtonClick() {
-//        Log.e("ASHWIN", "LOG1");
-//        Log.e("VIDEO_W", ">" + callLocalTrackManager.getLocalVideoTrack().getVideoFormat().dimensions.width);
-//        Log.e("VIDEO_H", ">" + callLocalTrackManager.getLocalVideoTrack().getVideoFormat().dimensions.height);
-//        Log.e("VIDEO_FRA", ">" + callLocalTrackManager.getLocalVideoTrack().getVideoFormat().framerate);
-        //       String text = "ASHWIN>USINGFRONTCAM>" + isUsingFrontCamera + ">LOCAL_IN_PRIMARY>" + localIsInPrimary;
-        //     Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
-
-        // callLocalTrackManager.changeAction();
-        //     callLocalTrackManager.changeVideoResolution(VideoDimensions.HD_720P_VIDEO_DIMENSIONS, primaryVideoView);
-
-        analytics.logEvent("popin_in_call_pip", "call_id", call_id);
-        enterPip();
-
-    }
-
-    @OnClick(R2.id.connect_action_fab)
-    void disconnect() {
-        analytics.logEvent("popin_in_call_disconnect_click", "call_id", call_id);
-        if (room != null) {
-            room.disconnect();
-            finish();
-        }
-        callPresenter.disconnectCall();
-    }
-
-    @OnClick(R2.id.switch_camera_action_fab)
-    void switchCamera() {
-        analytics.logEvent("popin_in_call_switch_camera", "call_id", call_id);
-        callLocalTrackManager.switchCamera(isFrontCamera -> {
-            this.isUsingFrontCamera = !this.isUsingFrontCamera;
-            if (localIsInPrimary) {
-                primaryVideoView.setMirror(isUsingFrontCamera);
-                thumbnailVideoView.setMirror(false);
-            } else {
-                primaryVideoView.setMirror(false);
-                thumbnailVideoView.setMirror(isUsingFrontCamera);
-            }
-        });
-    }
-
-    @OnClick(R2.id.local_video_action_fab)
-    void localVideoClick() {
-        analytics.logEvent("popin_in_call_toggle_camera", "call_id", call_id);
-        callLocalTrackManager.toggleCamera(enable -> {
-            mutedVideo = !enable;
-            int icon;
-            if (enable) {
-                icon = R.drawable.ic_videocam_white_24dp;
-                switchCameraActionFab.show();
-            } else {
-                icon = R.drawable.ic_camera_off;
-                switchCameraActionFab.hide();
-            }
-            localVideoActionFab.setImageDrawable(ContextCompat.getDrawable(CallActivity.this, icon));
-        });
-    }
-
-    @OnClick(R2.id.mute_action_fab)
-    void muteAudio() {
-        analytics.logEvent("popin_in_call_mute_audio", "call_id", call_id);
-        callLocalTrackManager.toggleMute(enable -> {
-            mutedAudio = !enable;
-            int icon = enable ? R.drawable.ic_mic_white_24dp : R.drawable.ic_mic_off;
-            muteActionFab.setImageDrawable(ContextCompat.getDrawable(CallActivity.this, icon));
-        });
-    }
-
-    @OnClick(R2.id.thumbnail_video_view)
-    void onThumbnailViewClicked() {
-        analytics.logEvent("popin_in_call_interchange_primary", "call_id", call_id);
-        if (!isThumbnailClicked) {
-            //move local to primary
-            localIsInPrimary = true;
-            callLocalTrackManager.changeVideoSink(thumbnailVideoView, primaryVideoView);
-            localVideoSink = primaryVideoView;
-            if (remoteVideoTrack != null) {
-                primaryVideoView.setMirror(isUsingFrontCamera);
-                thumbnailVideoView.setMirror(false);
-                remoteVideoTrack.removeSink(primaryVideoView);
-                remoteVideoTrack.addSink(thumbnailVideoView);
-            }
-
-        } else {
-            //move local to thumbnail
-            localIsInPrimary = false;
-            callLocalTrackManager.changeVideoSink(primaryVideoView, thumbnailVideoView);
-            if (remoteVideoTrack != null) {
-                //move remote to primary
-                primaryVideoView.setMirror(false);
-                thumbnailVideoView.setMirror(isUsingFrontCamera);
-                primaryVideoView.setMirror(false);
-                remoteVideoTrack.removeSink(thumbnailVideoView);
-                remoteVideoTrack.addSink(primaryVideoView);
-            }
-        }
-
-        isThumbnailClicked = !isThumbnailClicked;
     }
 
     @Override

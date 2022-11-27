@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
         buttonInitialize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Popin.initialize(MainActivity.this);
+                Popin.init(MainActivity.this);
             }
         });
 
