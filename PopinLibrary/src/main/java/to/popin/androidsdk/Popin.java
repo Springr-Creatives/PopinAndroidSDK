@@ -8,6 +8,9 @@ import android.util.Log;
 
 import to.popin.androidsdk.common.Device;
 import to.popin.androidsdk.common.MainThreadBus;
+import to.popin.androidsdk.events.CallCancelEvent;
+import to.popin.androidsdk.schedule.ScheduleInteractor;
+import to.popin.androidsdk.schedule.SchedulePresenter;
 import to.popin.androidsdk.session.PopinSession;
 
 public class Popin {
@@ -17,6 +20,7 @@ public class Popin {
     private ConnectionWorker connectionWorker;
     private PopinEventsListener popinEventsListener;
     private MainThreadBus mainThreadBus;
+    private SchedulePresenter schedulePresenter;
     private static Popin popin;
 
     public static synchronized Popin init(Context context) {
@@ -37,6 +41,7 @@ public class Popin {
 
     public Popin(Context context) {
         try {
+            Log.e("PACKAGE", "INITIALISATION");
             this.context = context;
             Device device = new Device(context);
             ApplicationInfo applicationInfo = context.getPackageManager()
@@ -46,8 +51,9 @@ public class Popin {
                 device.setSeller(apiKey);
                 mainThreadBus = new MainThreadBus();
                 popinSession = new PopinSession(context, device);
+                Log.e("POPIN", "SESSION_UPDATE");
                 popinSession.updateSession();
-
+                schedulePresenter = new SchedulePresenter(new ScheduleInteractor(device));
             }
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -56,13 +62,37 @@ public class Popin {
 
     public void startConnection(PopinEventsListener popinEventsListener) {
         this.popinEventsListener = popinEventsListener;
+        popinEventsListener.onCallStart();
         connectionWorker = new ConnectionWorker(popinSession.getContext(), popinSession.getDevice());
-        pusherWorker = new PusherWorker(popinSession.getContext(), popinSession.getDevice(), () -> connectionWorker.startConnection(), popinEventsListener);
+        pusherWorker = new PusherWorker(popinSession.getContext(), popinSession.getDevice(),
+                () -> connectionWorker.startConnection(), new PopinConnectionListener() {
+            @Override
+            public void onExpertsBusy() {
+                popinEventsListener.onAllExpertsBusy();
+            }
+
+            @Override
+            public void onConnectionEstablished() {
+                startCall();
+            }
+
+            @Override
+            public void onCallDisconnected(int call_id) {
+                mainThreadBus.post(new CallCancelEvent(call_id));
+            }
+        });
     }
 
+    public void getAvailableScheduleSlots(PopinScheduleListener popinScheduleListener) {
+        schedulePresenter.getScheduleSlots(popinScheduleListener);
+    }
 
-    public void startCall() {
-        Intent intent=new Intent(context, to.popin.androidsdk.call.CallActivity.class);
+    public void createSchedule(String time, PopinCreateScheduleListener popinCreateScheduleListener) {
+        schedulePresenter.createSchedule(time,popinCreateScheduleListener);
+    }
+
+    private void startCall() {
+        Intent intent = new Intent(context, to.popin.androidsdk.call.CallActivity.class);
         context.startActivity(intent);
 
     }

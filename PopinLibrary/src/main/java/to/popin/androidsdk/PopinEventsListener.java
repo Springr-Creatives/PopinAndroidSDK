@@ -1,9 +1,8 @@
 package to.popin.androidsdk;
 
 public interface PopinEventsListener {
-    void onConnectionEstablished();
+    void onCallStart();
     void onAllExpertsBusy();
     void onCallConnected();
     void onCallDisconnected();
-    void onCallFail();
 }

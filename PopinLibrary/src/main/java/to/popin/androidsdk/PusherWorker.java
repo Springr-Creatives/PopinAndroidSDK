@@ -25,14 +25,14 @@ public class PusherWorker {
     private final Device device;
     private Pusher pusher;
     private Channel privateChannel;
-    private PusherConnectionListener pusherConnectionWorker;
-    private PopinEventsListener popinEventsListener;
+    private final PusherConnectionListener pusherConnectionWorker;
+    private final PopinConnectionListener popinConnectionListener;
 
-    public PusherWorker(Context context, Device device, PusherConnectionListener pusherConnectionWorker,PopinEventsListener popinEventsListener) {
+    public PusherWorker(Context context, Device device, PusherConnectionListener pusherConnectionWorker,PopinConnectionListener popinConnectionListener) {
         this.context =context;
         this.device = device;
         this.pusherConnectionWorker = pusherConnectionWorker;
-        this.popinEventsListener = popinEventsListener;
+        this.popinConnectionListener = popinConnectionListener;
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + device.getToken());
         headers.put("Content-Type", "application/x-www-form-urlencoded");
@@ -42,7 +42,6 @@ public class PusherWorker {
         PusherOptions options = new PusherOptions().setAuthorizer(authorizer).setCluster("ap2");
         try {
             pusher = new Pusher(context.getString(R.string.pusher_key), options);
-            Log.e("CONNECT", "PUSHER");
             pusher.connect(new ConnectionEventListener() {
                 @Override
                 public void onConnectionStateChange(ConnectionStateChange change) {
@@ -61,6 +60,7 @@ public class PusherWorker {
                     );
                 }
             }, ConnectionState.ALL);
+
         } catch (Exception e) {
             Log.e("ERROR_PUSHER", ">" + e.getMessage());
         }
@@ -102,18 +102,21 @@ public class PusherWorker {
 
             @Override
             public void onEvent(PusherEvent event) {
+                Log.e("POPIN","MSG");
                 if (event.getEventName().equals("user.message")) {
                     try {
                         JSONObject eventObj = new JSONObject(event.getData());
                         JSONObject message = eventObj.getJSONObject("message");
                         int type = message.getInt("type");
                         if (type == 3) { //connected
-                            popinEventsListener.onConnectionEstablished();
+                            Log.e("POPIN","CONNECTED");
+                            popinConnectionListener.onConnectionEstablished();
                         } else if (type == 15) {
-                            popinEventsListener.onAllExpertsBusy();
+                            popinConnectionListener.onExpertsBusy();
                         }
 
                     } catch (JSONException e) {
+                        Log.e("POPIN","MESG_ERR");
                         e.printStackTrace();
                     }
                 }
@@ -127,8 +130,13 @@ public class PusherWorker {
             public void onEvent(PusherEvent event) {
                 Log.e("EVENT", "call_cancel RECEIVED");
                 if (event.getEventName().equals("user.call_cancel")) {
-                    popinEventsListener.onCallDisconnected();
-
+                    try {
+                        JSONObject eventObj = new JSONObject(event.getData());
+                        int call_id = eventObj.getInt("call_id");
+                        popinConnectionListener.onCallDisconnected(call_id);
+                    } catch (Exception e) {
+                        Log.e("ERROR", "CALL_CANCEL_PUSHER_ERR");
+                    }
                 }
             }
 

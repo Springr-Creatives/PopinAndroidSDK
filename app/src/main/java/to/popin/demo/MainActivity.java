@@ -42,9 +42,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Popin.getInstance().startConnection(new PopinEventsListener() {
                     @Override
-                    public void onConnectionEstablished() {
-                        Popin.getInstance().startCall();
-                        //Toast.makeText(MainActivity.this,"CONNECTED",Toast.LENGTH_SHORT).show();
+                    public void onCallStart() {
+
                     }
 
                     @Override
@@ -60,11 +59,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCallDisconnected() {
                         runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_DISCONNECTED", Toast.LENGTH_SHORT).show());
-                    }
-
-                    @Override
-                    public void onCallFail() {
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_FAIL", Toast.LENGTH_SHORT).show());
                     }
                 });
             }
