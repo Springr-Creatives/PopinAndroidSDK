@@ -62,7 +62,6 @@ public class Popin {
 
     public void startConnection(PopinEventsListener popinEventsListener) {
         this.popinEventsListener = popinEventsListener;
-        popinEventsListener.onCallStart();
         connectionWorker = new ConnectionWorker(popinSession.getContext(), popinSession.getDevice());
         pusherWorker = new PusherWorker(popinSession.getContext(), popinSession.getDevice(),
                 () -> connectionWorker.startConnection(), new PopinConnectionListener() {
@@ -73,6 +72,7 @@ public class Popin {
 
             @Override
             public void onConnectionEstablished() {
+                popinEventsListener.onCallStart();
                 startCall();
             }
 

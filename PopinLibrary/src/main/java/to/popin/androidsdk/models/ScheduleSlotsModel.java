@@ -12,7 +12,7 @@ public class ScheduleSlotsModel {
     public class ScheduleSlot {
         @SerializedName("date")
         public String date;
-        @SerializedName("id")
+        @SerializedName("slots")
         public List<String> timeSlots;
     }
 

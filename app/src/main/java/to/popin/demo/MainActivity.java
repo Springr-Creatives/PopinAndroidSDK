@@ -2,6 +2,7 @@ package to.popin.demo;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -21,6 +22,8 @@ import java.util.List;
 
 import to.popin.androidsdk.Popin;
 import to.popin.androidsdk.PopinEventsListener;
+import to.popin.androidsdk.PopinScheduleListener;
+import to.popin.androidsdk.models.ScheduleSlotsModel;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,6 +62,25 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCallDisconnected() {
                         runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_DISCONNECTED", Toast.LENGTH_SHORT).show());
+                    }
+                });
+            }
+        });
+
+        Button buttonSchedule = findViewById(R.id.buttonSchedule);
+
+        buttonSchedule.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Popin.getInstance().getAvailableScheduleSlots(new PopinScheduleListener() {
+                    @Override
+                    public void onAvailableScheduleLoaded(List<ScheduleSlotsModel.ScheduleSlot> scheduleSlots) {
+                        Log.e("SCHEDULE_SIZE",">" + scheduleSlots.size());
+                    }
+
+                    @Override
+                    public void onScheduleLoadError() {
+
                     }
                 });
             }
