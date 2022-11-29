@@ -15,6 +15,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -103,6 +104,7 @@ public class Popin {
                             }
                         }).check();
             }
+            mainThreadBus.register(this);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -126,10 +128,18 @@ public class Popin {
 
             @Override
             public void onCallDisconnected(int call_id) {
+                popinEventsListener.onCallDisconnected();
                 mainThreadBus.post(new CallCancelEvent(call_id));
             }
         });
     }
+
+    @Subscribe
+    public void onCallEnd(CallCancelEvent callCancelEvent) {
+        popinEventsListener.onCallDisconnected();
+    }
+
+
 
     public void getAvailableScheduleSlots(PopinScheduleListener popinScheduleListener) {
         schedulePresenter.getScheduleSlots(popinScheduleListener);
@@ -142,6 +152,5 @@ public class Popin {
     private void startCall() {
         Intent intent = new Intent(context, to.popin.androidsdk.call.CallActivity.class);
         context.startActivity(intent);
-
     }
 }
