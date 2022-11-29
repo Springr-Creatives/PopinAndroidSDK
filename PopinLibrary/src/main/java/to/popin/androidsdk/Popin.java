@@ -1,10 +1,19 @@
 package to.popin.androidsdk;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
+
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
+import java.util.List;
 
 import to.popin.androidsdk.common.Device;
 import to.popin.androidsdk.common.MainThreadBus;
@@ -24,6 +33,13 @@ public class Popin {
     private static Popin popin;
 
     public static synchronized Popin init(Context context) {
+        if (popin == null) {
+            popin = new Popin(context);
+        }
+        return popin;
+    }
+
+    public static synchronized Popin init(Context context, String userName, String contactInfo) {
         if (popin == null) {
             popin = new Popin(context);
         }
@@ -55,6 +71,19 @@ public class Popin {
                 popinSession.updateSession();
                 schedulePresenter = new SchedulePresenter(new ScheduleInteractor(device));
             }
+            Dexter.withContext(context)
+                    .withPermissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+                    .withListener(new MultiplePermissionsListener() {
+                        @Override
+                        public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
+                        
+                        }
+
+                        @Override
+                        public void onPermissionRationaleShouldBeShown(List<PermissionRequest> list, PermissionToken permissionToken) {
+
+                        }
+                    }).check();
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -88,7 +117,7 @@ public class Popin {
     }
 
     public void createSchedule(String time, PopinCreateScheduleListener popinCreateScheduleListener) {
-        schedulePresenter.createSchedule(time,popinCreateScheduleListener);
+        schedulePresenter.createSchedule(time, popinCreateScheduleListener);
     }
 
     private void startCall() {
