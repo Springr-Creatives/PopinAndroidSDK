@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.core.content.ContextCompat;
 
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
@@ -71,19 +74,35 @@ public class Popin {
                 popinSession.updateSession();
                 schedulePresenter = new SchedulePresenter(new ScheduleInteractor(device));
             }
-            Dexter.withContext(context)
-                    .withPermissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
-                    .withListener(new MultiplePermissionsListener() {
-                        @Override
-                        public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
-                        
-                        }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                Dexter.withContext(context)
+                        .withPermissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.BLUETOOTH_CONNECT)
+                        .withListener(new MultiplePermissionsListener() {
+                            @Override
+                            public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
 
-                        @Override
-                        public void onPermissionRationaleShouldBeShown(List<PermissionRequest> list, PermissionToken permissionToken) {
+                            }
 
-                        }
-                    }).check();
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> list, PermissionToken permissionToken) {
+
+                            }
+                        }).check();
+            } else {
+                Dexter.withContext(context)
+                        .withPermissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+                        .withListener(new MultiplePermissionsListener() {
+                            @Override
+                            public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
+
+                            }
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> list, PermissionToken permissionToken) {
+
+                            }
+                        }).check();
+            }
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
