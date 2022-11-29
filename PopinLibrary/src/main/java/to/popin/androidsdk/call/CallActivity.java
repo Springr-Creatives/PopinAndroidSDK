@@ -220,17 +220,18 @@ public class CallActivity extends AppCompatActivity implements CallActivityView 
 
 
     private boolean checkPermissionForCameraMicrophoneAndBluetooth() {
-        int resultCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        int resultMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            int resultBluetooth = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
-            return resultCamera == PackageManager.PERMISSION_GRANTED
-                    && resultMic == PackageManager.PERMISSION_GRANTED
-                    && resultBluetooth == PackageManager.PERMISSION_GRANTED;
-        } else {
-            return resultCamera == PackageManager.PERMISSION_GRANTED
-                    && resultMic == PackageManager.PERMISSION_GRANTED;
-        }
+        return true;
+//        int resultCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+//        int resultMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//            int resultBluetooth = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+//            return resultCamera == PackageManager.PERMISSION_GRANTED
+//                    && resultMic == PackageManager.PERMISSION_GRANTED
+//                    && resultBluetooth == PackageManager.PERMISSION_GRANTED;
+//        } else {
+//            return resultCamera == PackageManager.PERMISSION_GRANTED
+//                    && resultMic == PackageManager.PERMISSION_GRANTED;
+//        }
     }
 
     private void loadViews() {
