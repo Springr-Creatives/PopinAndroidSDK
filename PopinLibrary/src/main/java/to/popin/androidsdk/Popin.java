@@ -139,7 +139,11 @@ public class Popin {
         popinEventsListener.onCallDisconnected();
     }
 
+    
 
+    public void setRating(int rating) {
+
+    }
 
     public void getAvailableScheduleSlots(PopinScheduleListener popinScheduleListener) {
         schedulePresenter.getScheduleSlots(popinScheduleListener);
