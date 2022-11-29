@@ -36,13 +36,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Popin.init(MainActivity.this);
-            }
-        });
-
-        Button buttonConnect = findViewById(R.id.buttonConnect);
-        buttonConnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
                 Popin.getInstance().startConnection(new PopinEventsListener() {
                     @Override
                     public void onCallStart() {
@@ -66,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+
 
         Button buttonSchedule = findViewById(R.id.buttonSchedule);
 

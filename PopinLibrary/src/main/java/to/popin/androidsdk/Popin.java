@@ -25,6 +25,7 @@ import to.popin.androidsdk.events.CallCancelEvent;
 import to.popin.androidsdk.schedule.ScheduleInteractor;
 import to.popin.androidsdk.schedule.SchedulePresenter;
 import to.popin.androidsdk.session.PopinSession;
+import to.popin.androidsdk.session.PopinSessionInteractor;
 
 public class Popin {
     private Context context;
@@ -35,6 +36,7 @@ public class Popin {
     private MainThreadBus mainThreadBus;
     private SchedulePresenter schedulePresenter;
     private static Popin popin;
+    private boolean initialised = false;
 
     public static synchronized Popin init(Context context) {
         if (popin == null) {
@@ -71,8 +73,35 @@ public class Popin {
                 device.setSeller(apiKey);
                 mainThreadBus = new MainThreadBus();
                 popinSession = new PopinSession(context, device);
-                Log.e("POPIN", "SESSION_UPDATE");
-                popinSession.updateSession();
+                popinSession.updateSession(() -> {
+                    connectionWorker = new ConnectionWorker(popinSession.getContext(), popinSession.getDevice());
+
+                    pusherWorker = new PusherWorker(popinSession.getContext(), popinSession.getDevice(),
+                            () -> initialised = true, new PopinConnectionListener() {
+                        @Override
+                        public void onExpertsBusy() {
+                            if (popinEventsListener!=null) {
+                                popinEventsListener.onAllExpertsBusy();
+                            }
+                        }
+
+                        @Override
+                        public void onConnectionEstablished() {
+                            if (popinEventsListener!=null) {
+                                popinEventsListener.onCallStart();
+                                startCall();
+                            }
+                        }
+
+                        @Override
+                        public void onCallDisconnected(int call_id) {
+                            if (popinEventsListener!=null) {
+                                popinEventsListener.onCallDisconnected();
+                                mainThreadBus.post(new CallCancelEvent(call_id));
+                            }
+                        }
+                    });
+                });
                 schedulePresenter = new SchedulePresenter(new ScheduleInteractor(device));
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -112,26 +141,18 @@ public class Popin {
 
     public void startConnection(PopinEventsListener popinEventsListener) {
         this.popinEventsListener = popinEventsListener;
-        connectionWorker = new ConnectionWorker(popinSession.getContext(), popinSession.getDevice());
-        pusherWorker = new PusherWorker(popinSession.getContext(), popinSession.getDevice(),
-                () -> connectionWorker.startConnection(), new PopinConnectionListener() {
-            @Override
-            public void onExpertsBusy() {
-                popinEventsListener.onAllExpertsBusy();
+        new Thread(() -> {
+            while (!initialised) {
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+            connectionWorker.startConnection();
 
-            @Override
-            public void onConnectionEstablished() {
-                popinEventsListener.onCallStart();
-                startCall();
-            }
+        }).start();
 
-            @Override
-            public void onCallDisconnected(int call_id) {
-                popinEventsListener.onCallDisconnected();
-                mainThreadBus.post(new CallCancelEvent(call_id));
-            }
-        });
     }
 
     @Subscribe
@@ -139,7 +160,6 @@ public class Popin {
         popinEventsListener.onCallDisconnected();
     }
 
-    
 
     public void setRating(int rating) {
 

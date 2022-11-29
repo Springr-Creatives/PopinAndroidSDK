@@ -15,9 +15,11 @@ public class PopinSession {
         this.popinSessionInteractor = new PopinSessionInteractor(context, device);
     }
 
-    public void updateSession() {
+    public void updateSession(PopinSessionInteractor.RegistrationListener registrationListener) {
         if (device.getToken().length() == 0) {
-            popinSessionInteractor.registerForToken(device.getSeller());
+            popinSessionInteractor.registerForToken(device.getSeller(), registrationListener);
+        } else {
+            registrationListener.onRegistered();
         }
     }
 

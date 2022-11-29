@@ -31,7 +31,7 @@ public class PopinSessionInteractor {
         this.apiInterface = retrofit.create(APIInterface.class);
     }
 
-    public void registerForToken(int seller) {
+    public void registerForToken(int seller,RegistrationListener registrationListener) {
         Log.e("POPIN","GET_TOKEN");
         Call<UserModel> call = apiInterface.registerUser(seller, 1, "Test Device");
         call.enqueue(new Callback<UserModel>() {
@@ -45,6 +45,7 @@ public class PopinSessionInteractor {
                         Log.e("POPIN","GET_TOKEN2");
                         myPhone.saveToken(userModel.token);
                         myPhone.saveChannel(userModel.channel);
+                        registrationListener.onRegistered();
                         return;
                     }
                 }
@@ -58,5 +59,8 @@ public class PopinSessionInteractor {
         });
     }
 
+    public interface RegistrationListener {
+        void onRegistered();
+    }
 
 }
