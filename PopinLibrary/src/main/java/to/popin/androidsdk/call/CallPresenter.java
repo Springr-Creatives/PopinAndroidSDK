@@ -89,11 +89,13 @@ public class CallPresenter implements LifecycleObserver {
 
 
     public void disconnectCall() {
+        mainThreadBus.post(new CallCancelEvent(call_id));
         callInteractor.disconnectCall(call_id, () -> {
             if (callActivityView != null) {
                 callActivityView.closeActivity();
             }
         });
+
     }
 
 
