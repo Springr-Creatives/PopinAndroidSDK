@@ -24,7 +24,7 @@ public class PopinSessionInteractor {
         this.myPhone = myPhone;
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://dev.popin.to/api/")
+                .baseUrl("https://widget01.popin.to/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient.build())
                 .build();

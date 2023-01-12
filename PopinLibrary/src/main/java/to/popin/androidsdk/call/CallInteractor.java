@@ -27,7 +27,7 @@ public class CallInteractor {
         this.myPhone = myPhone;
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(new AuthInterceptor(myPhone));
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://dev.popin.to/api/")
+                .baseUrl("https://widget01.popin.to/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient.build())
                 .build();
