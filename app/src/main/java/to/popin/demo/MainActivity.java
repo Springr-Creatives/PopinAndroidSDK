@@ -32,32 +32,29 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button buttonInitialize = findViewById(R.id.buttonInitialize);
-        buttonInitialize.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Popin.init(MainActivity.this);
-                Popin.getInstance().startConnection(new PopinEventsListener() {
-                    @Override
-                    public void onCallStart() {
+        buttonInitialize.setOnClickListener(view -> {
+            Popin.init(MainActivity.this);
+            Popin.getInstance().startConnection(new PopinEventsListener() {
+                @Override
+                public void onCallStart() {
 
-                    }
+                }
 
-                    @Override
-                    public void onAllExpertsBusy() {
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "EXPERT BUSY", Toast.LENGTH_SHORT).show());
-                    }
+                @Override
+                public void onAllExpertsBusy() {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "EXPERT BUSY", Toast.LENGTH_SHORT).show());
+                }
 
-                    @Override
-                    public void onCallConnected() {
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_CONNECTED", Toast.LENGTH_SHORT).show());
-                    }
+                @Override
+                public void onCallConnected() {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_CONNECTED", Toast.LENGTH_SHORT).show());
+                }
 
-                    @Override
-                    public void onCallDisconnected() {
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_DISCONNECTED", Toast.LENGTH_SHORT).show());
-                    }
-                });
-            }
+                @Override
+                public void onCallDisconnected() {
+                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_DISCONNECTED", Toast.LENGTH_SHORT).show());
+                }
+            });
         });
 
 

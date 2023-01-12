@@ -12,8 +12,7 @@
         android:layout_margin="16dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-         />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.twilio.video.VideoView
         android:id="@+id/primary_video_view"
@@ -23,8 +22,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-
 
 
     <LinearLayout
@@ -62,11 +59,12 @@
         android:layout_height="wrap_content"
         android:layout_margin="48dp"
         android:backgroundTint="@color/red"
-        android:src="@drawable/ic_video_call_white_24dp"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@drawable/ic_video_call_white_24dp"
+        app:tint="@null" />
 
 
     <LinearLayout
@@ -85,10 +83,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="16dp"
-            android:backgroundTint="@color/black"
-            android:src="@drawable/ic_switch_camera"
-            android:tint="@color/white"
-            app:fabSize="mini" />
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_switch_camera" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/local_video_action_fab"
@@ -96,10 +92,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="16dp"
-            android:backgroundTint="@color/black"
-            android:src="@drawable/ic_videocam_white_24dp"
-            android:tint="@color/white"
-            app:fabSize="mini" />
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_videocam_white_24dp" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/mute_action_fab"
@@ -107,20 +101,16 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="16dp"
-            android:backgroundTint="@color/black"
-            android:src="@drawable/ic_mic_white_24dp"
-            android:tint="@color/white"
-            app:fabSize="mini" />
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_mic_white_24dp" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/action_chat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:backgroundTint="@color/black"
-            android:src="@drawable/ic_baseline_arrow_back_24"
-            android:tint="@color/white"
-            app:fabSize="mini" />
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_baseline_arrow_back_24" />
 
     </LinearLayout>
 

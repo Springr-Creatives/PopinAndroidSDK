@@ -116,7 +116,11 @@ public class CallActivity extends AppCompatActivity implements CallActivityView 
             Video.setLogLevel(LogLevel.DEBUG);
         }
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
         getLifecycle().addObserver(callPresenter);
 
         List<Class<? extends AudioDevice>> preferredDevices = new ArrayList<>();
@@ -151,8 +155,6 @@ public class CallActivity extends AppCompatActivity implements CallActivityView 
             @Override
             public void onConnected(Room room) {
                 localParticipant = room.getLocalParticipant();
-                setTitle(room.getName());
-
                 for (RemoteParticipant remoteParticipant : room.getRemoteParticipants()) {
                     addRemoteParticipant(remoteParticipant);
                     break;
