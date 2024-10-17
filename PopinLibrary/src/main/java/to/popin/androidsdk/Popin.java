@@ -121,6 +121,7 @@ public class Popin {
     }
 
     public void startCall(PopinEventsListener popinEventsListener) {
+
         this.popinEventsListener = popinEventsListener;
         connectionWorker.startConnection(new ConnectionWorker.CreateConnectionListener() {
             @Override

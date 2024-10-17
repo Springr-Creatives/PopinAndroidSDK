@@ -290,6 +290,7 @@ class CallActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
         lifecycleScope.launchWhenResumed {
             viewModel.error.collect {
                 if (it != null) {
@@ -305,6 +306,8 @@ class CallActivity : AppCompatActivity() {
                 Toast.makeText(this@CallActivity, "Data received: $it", Toast.LENGTH_LONG).show()
             }
         }
+        actionBar?.hide()
+        supportActionBar?.hide()
     }
 
     private fun requestMediaProjection() {

@@ -38,17 +38,7 @@
         app:layout_constraintLeft_toLeftOf="parent">
 
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/add_participant"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:backgroundTint="@color/black"
-            android:layout_marginBottom="16dp"
-            android:src="@drawable/ic_baseline_person_add_24"
-            android:tint="@color/white"
-            app:tint="@android:color/white"
-            app:fabSize="mini" />
+
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/screen_share"

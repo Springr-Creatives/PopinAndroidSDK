@@ -18,7 +18,7 @@ import to.popin.androidsdk.common.Device;
 import to.popin.androidsdk.models.UpdateConnectionModel;
 
 public class CallAcceptanceWaitHandler extends Handler {
-    private static final long INTERVAL = 10000; // 10 seconds
+    private static final long INTERVAL = 3000; // 10 seconds
     private static final long MAX_DURATION = 300000; // 5 minutes
     private final APIInterface apiInterface;
     private final CallAcceptanceListener callAcceptanceListener;
@@ -59,6 +59,7 @@ public class CallAcceptanceWaitHandler extends Handler {
         @Override
         public void run() {
             if (isRunning && elapsedTime < MAX_DURATION) {
+                Log.e("RUNNING","QUEUE");
                 Call<UpdateConnectionModel> call = apiInterface.getCallUpdate(callQueueId);
                 call.enqueue(new retrofit2.Callback<>() {
                     @Override
