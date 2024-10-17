@@ -1,6 +1,5 @@
 package to.popin.demo;
 
-import android.Manifest;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,15 +7,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.List;
 
@@ -34,29 +24,54 @@ public class MainActivity extends AppCompatActivity {
         Button buttonInitialize = findViewById(R.id.buttonInitialize);
         buttonInitialize.setOnClickListener(view -> {
             Popin.init(MainActivity.this);
-            Popin.getInstance().startConnection(new PopinEventsListener() {
-                @Override
-                public void onCallStart() {
 
-                }
-
-                @Override
-                public void onAllExpertsBusy() {
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "EXPERT BUSY", Toast.LENGTH_SHORT).show());
-                }
-
-                @Override
-                public void onCallConnected() {
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_CONNECTED", Toast.LENGTH_SHORT).show());
-                }
-
-                @Override
-                public void onCallDisconnected() {
-                    runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_DISCONNECTED", Toast.LENGTH_SHORT).show());
-                }
-            });
         });
 
+        Button buttonConnect = findViewById(R.id.buttonConnect);
+
+        buttonConnect.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Popin.getInstance().startCall(new PopinEventsListener() {
+                    @Override
+                    public void onCallStart() {
+                        Log.e("POPIN", "CALL_START");
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_START", Toast.LENGTH_SHORT).show());
+                    }
+
+                    @Override
+                    public void onQueuePositionChanged(int position) {
+                        Log.e("POPIN", "QUEUE POSITION >" + position);
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "QUEUE POSITION >" + position, Toast.LENGTH_SHORT).show());
+                    }
+
+                    @Override
+                    public void onAllExpertsBusy() {
+                        Log.e("POPIN", "EXPERT BUSY");
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "EXPERT BUSY", Toast.LENGTH_SHORT).show());
+                    }
+
+                    @Override
+                    public void onCallConnected() {
+                        Log.e("POPIN", "CALL_CONNECTED");
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_CONNECTED", Toast.LENGTH_SHORT).show());
+                    }
+
+                    @Override
+                    public void onCallFailed() {
+                        Log.e("POPIN", "CALL_FAILED");
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_FAILED", Toast.LENGTH_SHORT).show());
+                    }
+
+                    @Override
+                    public void onCallDisconnected() {
+                        Log.e("POPIN", "CALL_DISCONNECTED");
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_DISCONNECTED", Toast.LENGTH_SHORT).show());
+                    }
+                });
+            }
+        });
 
 
         Button buttonSchedule = findViewById(R.id.buttonSchedule);

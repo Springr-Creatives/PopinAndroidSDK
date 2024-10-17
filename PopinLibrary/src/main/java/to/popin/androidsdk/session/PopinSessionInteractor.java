@@ -12,6 +12,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import to.popin.androidsdk.R;
 import to.popin.androidsdk.common.APIInterface;
 import to.popin.androidsdk.common.Device;
 import to.popin.androidsdk.models.UserModel;
@@ -24,7 +25,7 @@ public class PopinSessionInteractor {
         this.myPhone = myPhone;
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://widget01.popin.to/api/")
+                .baseUrl(context.getString(R.string.server_url) +"/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient.build())
                 .build();

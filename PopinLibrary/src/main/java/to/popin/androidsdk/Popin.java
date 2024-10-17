@@ -6,9 +6,8 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Looper;
 import android.util.Log;
-
-import androidx.core.content.ContextCompat;
 
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
@@ -22,21 +21,21 @@ import java.util.List;
 import to.popin.androidsdk.common.Device;
 import to.popin.androidsdk.common.MainThreadBus;
 import to.popin.androidsdk.events.CallCancelEvent;
+import to.popin.androidsdk.models.FastCallModel;
 import to.popin.androidsdk.schedule.ScheduleInteractor;
 import to.popin.androidsdk.schedule.SchedulePresenter;
 import to.popin.androidsdk.session.PopinSession;
-import to.popin.androidsdk.session.PopinSessionInteractor;
 
 public class Popin {
     private Context context;
     private PopinSession popinSession;
-    private PusherWorker pusherWorker;
     private ConnectionWorker connectionWorker;
     private PopinEventsListener popinEventsListener;
     private MainThreadBus mainThreadBus;
     private SchedulePresenter schedulePresenter;
+    private CallAcceptanceWaitHandler waitHandler;
     private static Popin popin;
-    private boolean initialised = false;
+
 
     public static synchronized Popin init(Context context) {
         if (popin == null) {
@@ -75,34 +74,8 @@ public class Popin {
                 popinSession = new PopinSession(context, device);
                 popinSession.updateSession(() -> {
                     connectionWorker = new ConnectionWorker(popinSession.getContext(), popinSession.getDevice());
-
-                    pusherWorker = new PusherWorker(popinSession.getContext(), popinSession.getDevice(),
-                            () -> initialised = true, new PopinConnectionListener() {
-                        @Override
-                        public void onExpertsBusy() {
-                            if (popinEventsListener!=null) {
-                                popinEventsListener.onAllExpertsBusy();
-                            }
-                        }
-
-                        @Override
-                        public void onConnectionEstablished() {
-                            if (popinEventsListener!=null) {
-                                popinEventsListener.onCallStart();
-                                startCall();
-                            }
-                        }
-
-                        @Override
-                        public void onCallDisconnected(int call_id) {
-                            if (popinEventsListener!=null) {
-                                popinEventsListener.onCallDisconnected();
-                                mainThreadBus.post(new CallCancelEvent(call_id));
-                            }
-                        }
-                    });
                 });
-                schedulePresenter = new SchedulePresenter(new ScheduleInteractor(device));
+                schedulePresenter = new SchedulePresenter(new ScheduleInteractor(context, device));
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 Dexter.withContext(context)
@@ -139,20 +112,45 @@ public class Popin {
         }
     }
 
-    public void startConnection(PopinEventsListener popinEventsListener) {
+    public void cancelCall() {
+        try {
+            waitHandler.stopWaitingForAcceptance();
+        } catch (Exception e) {
+
+        }
+    }
+
+    public void startCall(PopinEventsListener popinEventsListener) {
         this.popinEventsListener = popinEventsListener;
-        new Thread(() -> {
-            while (!initialised) {
-                try {
-                    Thread.sleep(1500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        connectionWorker.startConnection(new ConnectionWorker.CreateConnectionListener() {
+            @Override
+            public void onConnectionStarted(int call_queue_id) {
+                popinEventsListener.onCallStart();
+
+                waitHandler = new CallAcceptanceWaitHandler(context, popin.popinSession.getDevice(), Looper.getMainLooper(), call_queue_id, new CallAcceptanceWaitHandler.CallAcceptanceListener() {
+                    @Override
+                    public void onQueuePositionChange(int position) {
+                        popinEventsListener.onQueuePositionChanged(position);
+                    }
+
+                    @Override
+                    public void onCallAccepted(int call_id) {
+                        startCall(call_id);
+                    }
+
+                    @Override
+                    public void onExpertBusy() {
+                        popinEventsListener.onAllExpertsBusy();
+                    }
+                });
+                waitHandler.startWaitingForAcceptance();
             }
-            connectionWorker.startConnection();
 
-        }).start();
-
+            @Override
+            public void onConnectionFailed() {
+                popinEventsListener.onCallFailed();
+            }
+        });
     }
 
     @Subscribe
@@ -173,8 +171,22 @@ public class Popin {
         schedulePresenter.createSchedule(time, popinCreateScheduleListener);
     }
 
-    private void startCall() {
-        Intent intent = new Intent(context, to.popin.androidsdk.call.CallActivity.class);
-        context.startActivity(intent);
+    private void startCall(int call_id) {
+        connectionWorker.getCallDetails(call_id, new ConnectionWorker.CallDetailsListener() {
+            @Override
+            public void onCallDetails(FastCallModel fastCallModel) {
+                popinEventsListener.onCallConnected();
+                Intent intent = new Intent(context, to.popin.androidsdk.call.CallActivity.class);
+                intent.putExtra("CALL", fastCallModel);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }
+
+            @Override
+            public void onCallDetailsFail() {
+                popinEventsListener.onCallFailed();
+            }
+        });
+
     }
 }

@@ -1,5 +1,6 @@
 package to.popin.androidsdk.schedule;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import to.popin.androidsdk.PopinCreateScheduleListener;
 import to.popin.androidsdk.PopinScheduleListener;
+import to.popin.androidsdk.R;
 import to.popin.androidsdk.common.APIInterface;
 import to.popin.androidsdk.common.AuthInterceptor;
 import to.popin.androidsdk.common.Device;
@@ -22,11 +24,11 @@ public class ScheduleInteractor {
     private final Device myPhone;
     private final APIInterface apiInterface;
 
-    public ScheduleInteractor(Device myPhone) {
+    public ScheduleInteractor(Context context, Device myPhone) {
         this.myPhone = myPhone;
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(new AuthInterceptor(myPhone));
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://widget01.popin.to/api/")
+                .baseUrl(context.getString(R.string.server_url) + "/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient.build())
                 .build();

@@ -5,9 +5,12 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
+import to.popin.androidsdk.models.CreateConnectionModel;
+import to.popin.androidsdk.models.UpdateConnectionModel;
+import to.popin.androidsdk.models.FastCallModel;
 import to.popin.androidsdk.models.ScheduleSlotsModel;
 import to.popin.androidsdk.models.StatusModel;
-import to.popin.androidsdk.models.TalkModel;
 import to.popin.androidsdk.models.UserModel;
 
 public interface APIInterface {
@@ -23,22 +26,10 @@ public interface APIInterface {
 
     @FormUrlEncoded
     @POST("v1/user/connect")
-    Call<StatusModel> startConnection(
-            @Field("seller_id") int seller_id
+    Call<CreateConnectionModel> startConnection(
+            @Field("seller_id") int seller_id,
+            @Field("session") String session
     );
-
-    @FormUrlEncoded
-    @POST("v1/user/call")
-    Call<TalkModel> createCall(
-            @Field("seller_id") int seller_id
-    );
-
-    @FormUrlEncoded
-    @POST("v1/user/call/end")
-    Call<StatusModel> setCallEnded(
-            @Field("call_id") int call_id
-    );
-
 
     @GET("v1/user/schedule")
     Call<ScheduleSlotsModel> getScheduleSlots();
@@ -48,5 +39,17 @@ public interface APIInterface {
     Call<StatusModel> setSchedule(
             @Field("seller_id") int seller_id,
             @Field("time") String time
+    );
+
+    @GET("v1/user/call/{id}")
+    Call<FastCallModel> getCallDetails(
+            @Path("id") int call_id
+    );
+
+
+    @FormUrlEncoded
+    @POST("v1/user/connect/update")
+    Call<UpdateConnectionModel> getCallUpdate(
+            @Field("call_queue_id") int call_queue_id
     );
 }

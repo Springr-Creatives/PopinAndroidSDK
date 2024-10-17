@@ -1,117 +1,195 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/black"
+    android:keepScreenOn="true">
 
-    <com.twilio.video.VideoView
-        android:id="@+id/thumbnail_video_view"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:layout_margin="16dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <com.twilio.video.VideoView
-        android:id="@+id/primary_video_view"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/speaker_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <LinearLayout
-        android:id="@+id/lytWaiting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:background="@color/no_video_background"
+        app:layout_constraintBottom_toTopOf="@id/audience_row"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ProgressBar
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:indeterminate="true"
-            android:indeterminateTint="@color/white" />
+    </androidx.recyclerview.widget.RecyclerView>
 
-        <TextView
-            android:id="@+id/textTrackDisabled"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
-            android:text="Waiting Connection"
-            android:textColor="@color/white" />
-    </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/connect_action_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="48dp"
-        android:backgroundTint="@color/red"
-        app:fabSize="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:srcCompat="@drawable/ic_video_call_white_24dp"
-        app:tint="@null" />
-
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/audience_row"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@id/exit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/linearLayoutSideButtons" />
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/linearLayoutSideButtons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/textArtifact"
         app:layout_constraintLeft_toLeftOf="parent">
 
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/switch_camera_action_fab"
+            android:id="@+id/add_participant"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:backgroundTint="@color/black"
             android:layout_marginBottom="16dp"
-            app:fabSize="mini"
-            app:srcCompat="@drawable/ic_switch_camera" />
+            android:src="@drawable/ic_baseline_person_add_24"
+            android:tint="@color/white"
+            app:tint="@android:color/white"
+            app:fabSize="mini" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/local_video_action_fab"
+            android:id="@+id/screen_share"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:backgroundTint="@color/black"
             android:layout_marginBottom="16dp"
-            app:fabSize="mini"
-            app:srcCompat="@drawable/ic_videocam_white_24dp" />
+            android:src="@drawable/baseline_cast_24"
+            android:tint="@color/white"
+            app:tint="@android:color/white"
+            app:fabSize="mini" />
+
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/mute_action_fab"
+            android:id="@+id/flip_camera"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginBottom="16dp"
-            app:fabSize="mini"
-            app:srcCompat="@drawable/ic_mic_white_24dp" />
+            android:enabled="false"
+            android:backgroundTint="@color/black"
+            android:src="@drawable/outline_flip_camera_android_24"
+            android:tint="@color/white"
+            app:tint="@android:color/white"
+            app:fabSize="mini" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@color/black"
+            android:src="@drawable/outline_videocam_24"
+            android:enabled="false"
+            android:tint="@color/white"
+            app:tint="@android:color/white"
+            app:fabSize="mini" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/mic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@color/black"
+            android:src="@drawable/outline_mic_24"
+            android:enabled="false"
+            android:tint="@color/white"
+            app:tint="@android:color/white"
+            app:fabSize="mini" />
+
+
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/action_chat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            app:fabSize="mini"
-            app:srcCompat="@drawable/ic_baseline_arrow_back_24" />
+            android:backgroundTint="@color/black"
+            android:src="@drawable/ic_baseline_arrow_back_24"
+            android:tint="@color/white"
+            app:tint="@android:color/white"
+            app:fabSize="mini" />
+
+        <ImageView
+            android:id="@+id/audio_select"
+            android:layout_width="@dimen/control_size"
+            android:layout_height="@dimen/control_size"
+            android:layout_weight="1"
+            android:visibility="gone"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="@dimen/control_padding"
+            android:src="@drawable/volume_up_48px"
+            app:tint="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/screen_share1"
+            android:layout_width="@dimen/control_size"
+            android:layout_height="@dimen/control_size"
+            android:layout_weight="1"
+            android:visibility="gone"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="@dimen/control_padding"
+            android:src="@drawable/baseline_cast_24"
+            app:tint="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/message"
+            android:layout_width="@dimen/control_size"
+            android:layout_height="@dimen/control_size"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="@dimen/control_padding"
+            android:src="@drawable/baseline_chat_24"
+            android:visibility="gone"
+            app:tint="@android:color/white" />
 
     </LinearLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/exit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/red"
+        android:src="@drawable/ic_call_end_white_24px"
+        app:tint="@android:color/white"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toTopOf="@+id/textArtifact"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <TextView
+        android:id="@+id/textArtifact"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center_horizontal"
+        android:maxLines="2"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Sample product name here" />
+
+    <TextView
+        android:id="@+id/textConnecting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CONNECTING ..."
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="24dp"
+        android:textColor="@color/white"
+        android:background="@drawable/translucent_black_rounded"
+        app:layout_constraintBottom_toBottomOf="@+id/speaker_view"
+        app:layout_constraintEnd_toEndOf="@+id/speaker_view"
+        app:layout_constraintStart_toStartOf="@+id/speaker_view"
+        app:layout_constraintTop_toTopOf="@+id/speaker_view" />
 </androidx.constraintlayout.widget.ConstraintLayout>
