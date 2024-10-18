@@ -112,3 +112,9 @@
 -keep class com.twilio.video.** { *; }
 -keep class com.twilio.common.** { *; }
 -keepattributes InnerClasses
+
+-keep public class to.popin.androidsdk.** { *; }
+
+-keepclassmembers class to.popin.androidsdk.** {
+    *;
+}
