@@ -6,6 +6,7 @@ import to.popin.androidsdk.BuildConfig
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import to.popin.androidsdk.R
 
 
 object RetrofitHelper {
@@ -42,7 +43,7 @@ object RetrofitHelper {
             }
             .build()
 
-        return Retrofit.Builder().baseUrl("https://test.popin.to" + "/api/")
+        return Retrofit.Builder().baseUrl(context.getString(R.string.server_url) + "/api/")
             .addConverterFactory(GsonConverterFactory.create())
             // we need to add converter factory to
             .client(httpClient)
