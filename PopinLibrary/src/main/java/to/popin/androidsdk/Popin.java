@@ -39,14 +39,14 @@ public class Popin {
 
     public static synchronized Popin init(Context context) {
         if (popin == null) {
-            popin = new Popin(context);
+            popin = new Popin(context, "", "");
         }
         return popin;
     }
 
     public static synchronized Popin init(Context context, String userName, String contactInfo) {
         if (popin == null) {
-            popin = new Popin(context);
+            popin = new Popin(context, userName, contactInfo);
         }
         return popin;
     }
@@ -60,7 +60,7 @@ public class Popin {
     }
 
 
-    public Popin(Context context) {
+    public Popin(Context context, String name, String mobile) {
         try {
             Log.e("PACKAGE", "INITIALISATION");
             this.context = context;
@@ -70,8 +70,8 @@ public class Popin {
             if (applicationInfo != null) {
                 int apiKey = applicationInfo.metaData.getInt("to.popin.androidsdk.POPIN_TOKEN");
                 device.setSeller(apiKey);
-                mainThreadBus = new MainThreadBus();
-                popinSession = new PopinSession(context, device);
+                mainThreadBus = MainThreadBus.getInstance(); // Use the singleton instance
+                popinSession = new PopinSession(context, device, name, mobile);
                 popinSession.updateSession(() -> {
                     connectionWorker = new ConnectionWorker(popinSession.getContext(), popinSession.getDevice());
                 });

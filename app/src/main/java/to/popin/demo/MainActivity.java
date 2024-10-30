@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Button buttonInitialize = findViewById(R.id.buttonInitialize);
         buttonInitialize.setOnClickListener(view -> {
-            Popin.init(MainActivity.this);
+            Popin.init(MainActivity.this, "ashwin", "9876543217");
 
         });
 

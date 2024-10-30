@@ -25,31 +25,28 @@ public class PopinSessionInteractor {
         this.myPhone = myPhone;
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(context.getString(R.string.server_url) +"/api/")
+                .baseUrl(context.getString(R.string.server_url) + "/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient.build())
                 .build();
         this.apiInterface = retrofit.create(APIInterface.class);
     }
 
-    public void registerForToken(int seller,RegistrationListener registrationListener) {
-        Log.e("POPIN","GET_TOKEN");
-        Call<UserModel> call = apiInterface.registerUser(seller, 1, "Test Device");
-        call.enqueue(new Callback<UserModel>() {
+    public void registerForToken(int seller, String name, String mobile, RegistrationListener registrationListener) {
+        Call<UserModel> call = apiInterface.registerUser(seller, 1, "Test Device", name, mobile);
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {
-                Log.e("POPIN","GET_TOKEN0>" + response.code());
                 if (response.code() == 200) {
-                    Log.e("POPIN","GET_TOKEN1");
                     UserModel userModel = response.body();
                     if (userModel != null && userModel.status == 1) {
-                        Log.e("POPIN","GET_TOKEN2");
-                        myPhone.saveToken(userModel.token);
+                         myPhone.saveToken(userModel.token);
                         myPhone.saveChannel(userModel.channel);
                         registrationListener.onRegistered();
                         return;
                     }
                 }
+                Log.e("POPIN", "TOKEN_END");
             }
 
             @Override

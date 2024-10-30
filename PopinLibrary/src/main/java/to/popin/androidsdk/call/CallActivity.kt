@@ -24,11 +24,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.twilio.audioswitch.AudioDevice
 import com.xwray.groupie.GroupieAdapter
-import to.popin.androidsdk.Popin
-import to.popin.androidsdk.R
-import to.popin.androidsdk.databinding.ActivityCallBinding
-import to.popin.androidsdk.models.FastCallModel
 import kotlinx.coroutines.flow.collectLatest
+import to.popin.androidsdk.R
+import to.popin.androidsdk.common.MainThreadBus
+import to.popin.androidsdk.databinding.ActivityCallBinding
+import to.popin.androidsdk.events.CallCancelEvent
+import to.popin.androidsdk.models.FastCallModel
 
 
 class CallActivity : AppCompatActivity() {
@@ -325,6 +326,8 @@ class CallActivity : AppCompatActivity() {
             //mainThreadBus.post(new CaptureRemarkEvent(call_id));
 
         }
+
+        viewModel.callModel?.let { MainThreadBus.getInstance().post(CallCancelEvent(it.id)) }
 
         super.onDestroy()
     }

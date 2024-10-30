@@ -21,7 +21,9 @@ public interface APIInterface {
     Call<UserModel> registerUser(
             @Field("seller_id") int seller_id,
             @Field("is_mobile") int is_mobile,
-            @Field("device") String device
+            @Field("device") String device,
+            @Field("name") String name,
+            @Field("mobile") String mobile
     );
 
     @FormUrlEncoded

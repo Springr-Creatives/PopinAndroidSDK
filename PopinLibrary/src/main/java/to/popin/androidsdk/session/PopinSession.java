@@ -8,16 +8,20 @@ public class PopinSession {
     private final PopinSessionInteractor popinSessionInteractor;
     private final Device device;
     private final Context context;
+    private final String name;
+    private final String mobile;
 
-    public PopinSession(Context context , Device device) {
+    public PopinSession(Context context, Device device, String name, String mobile) {
         this.device = device;
-        this.context=context;
+        this.context = context;
+        this.name = name;
+        this.mobile = mobile;
         this.popinSessionInteractor = new PopinSessionInteractor(context, device);
     }
 
     public void updateSession(PopinSessionInteractor.RegistrationListener registrationListener) {
         if (device.getToken().length() == 0) {
-            popinSessionInteractor.registerForToken(device.getSeller(), registrationListener);
+            popinSessionInteractor.registerForToken(device.getSeller(), name, mobile, registrationListener);
         } else {
             registrationListener.onRegistered();
         }
