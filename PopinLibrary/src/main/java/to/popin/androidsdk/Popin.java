@@ -35,6 +35,7 @@ public class Popin {
     private SchedulePresenter schedulePresenter;
     private CallAcceptanceWaitHandler waitHandler;
     private static Popin popin;
+    private boolean disconnectButtonVisible = true;
 
 
     public static synchronized Popin init(Context context) {
@@ -120,8 +121,11 @@ public class Popin {
         }
     }
 
-    public void startCall(PopinEventsListener popinEventsListener) {
+    public void setDisconnectButtonVisibility(boolean visible) {
+        disconnectButtonVisible = visible;
+    }
 
+    public void startCall(PopinEventsListener popinEventsListener) {
         this.popinEventsListener = popinEventsListener;
         connectionWorker.startConnection(new ConnectionWorker.CreateConnectionListener() {
             @Override
@@ -179,6 +183,7 @@ public class Popin {
                 popinEventsListener.onCallConnected();
                 Intent intent = new Intent(context, to.popin.androidsdk.call.CallActivity.class);
                 intent.putExtra("CALL", fastCallModel);
+                intent.putExtra("DISCONNECT_VISIBLE", disconnectButtonVisible);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }

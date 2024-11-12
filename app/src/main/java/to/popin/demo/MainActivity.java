@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         Button buttonInitialize = findViewById(R.id.buttonInitialize);
         buttonInitialize.setOnClickListener(view -> {
             Popin.init(MainActivity.this, "ashwin", "9876543217");
-
+            Popin.getInstance().setDisconnectButtonVisibility(false);
         });
 
         Button buttonConnect = findViewById(R.id.buttonConnect);

@@ -157,9 +157,11 @@ class CallViewModel(
                         }
 
                         is RoomEvent.TrackSubscribed -> {
+
                             val track = it.track
                             val participant = it.participant
-                            if (track.kind.equals("video") && !initialSet) {
+
+                            if (track.kind == Track.Kind.VIDEO && !initialSet) {
                                 initialSet = true
                                 mConnectionStatus.setValue(ConnectionStatus(""))
                                 setPrimaryWindowByIdentity(participant.identity)
@@ -209,7 +211,8 @@ class CallViewModel(
                     .firstOrNull { it.identity == identity }
 
                 if (participantByIdentity != null) {
-                    mutablePrimarySpeaker.value = participantByIdentity
+                    Log.e("SET","IDENTITY");
+                     mutablePrimarySpeaker.value = participantByIdentity
                     return@collect // Stop collecting once we've found and set the primary speaker
                 }
             }

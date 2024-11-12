@@ -40,6 +40,7 @@ class CallActivity : AppCompatActivity() {
     }
 
     lateinit var binding: ActivityCallBinding
+    var disconnectVisible = true;
     private val screenCaptureIntentLauncher =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
@@ -78,9 +79,11 @@ class CallActivity : AppCompatActivity() {
         binding = ActivityCallBinding.inflate(layoutInflater)
         viewModel.callModel?.let { logEvent("call_create", "call_id", it.id) }
         setContentView(binding.root)
+        disconnectVisible = intent.getBooleanExtra("DISCONNECT_VISIBLE", true)
 
-
-
+        if (!disconnectVisible) {
+            binding.exit.visibility = View.GONE
+        }
 
 //        val mode = intent.getIntExtra("MODE", 0);
 //        if (mode != 1 ) {
