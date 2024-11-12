@@ -48,7 +48,7 @@ class CallViewModel(
 
     private val context = getApplication<Application>().applicationContext
 
-
+    private var initialSet = false;
     val room = LiveKit.create(
         appContext = application,
         options = RoomOptions(adaptiveStream = true, dynacast = false),
@@ -101,7 +101,8 @@ class CallViewModel(
 
     private val mLog: MutableLiveData<EventLog> = MutableLiveData<EventLog>()
 
-    private val mConnectionStatus: MutableLiveData<ConnectionStatus> = MutableLiveData<ConnectionStatus>()
+    private val mConnectionStatus: MutableLiveData<ConnectionStatus> =
+        MutableLiveData<ConnectionStatus>()
 
     fun getEventLog(): LiveData<EventLog>? {
         return mLog
@@ -123,7 +124,7 @@ class CallViewModel(
             launch {
                 room.events.collect {
                     when (it) {
-                          is RoomEvent.FailedToConnect -> {
+                        is RoomEvent.FailedToConnect -> {
                             mLog.setValue(
                                 EventLog(
                                     "call_failed_connect",
@@ -149,6 +150,20 @@ class CallViewModel(
                             val identity = it.participant?.identity ?: "server"
                             val message = it.data.toString(Charsets.UTF_8)
                             mutableDataReceived.emit("$identity: $message")
+                        }
+
+                        is RoomEvent.ParticipantConnected -> {
+                            mConnectionStatus.setValue(ConnectionStatus("Loading video..."))
+                        }
+
+                        is RoomEvent.TrackSubscribed -> {
+                            val track = it.track
+                            val participant = it.participant
+                            if (track.kind.equals("video") && !initialSet) {
+                                initialSet = true
+                                mConnectionStatus.setValue(ConnectionStatus(""))
+                                setPrimaryWindowByIdentity(participant.identity)
+                            }
                         }
 
                         is RoomEvent.ParticipantDisconnected -> {
@@ -187,6 +202,19 @@ class CallViewModel(
             application.startService(foregroundServiceIntent)
         }
     }
+    fun setPrimaryWindowByIdentity(identity: Participant.Identity?) {
+        viewModelScope.launch {
+            participants.collect { participantList ->
+                val participantByIdentity = participantList
+                    .firstOrNull { it.identity == identity }
+
+                if (participantByIdentity != null) {
+                    mutablePrimarySpeaker.value = participantByIdentity
+                    return@collect // Stop collecting once we've found and set the primary speaker
+                }
+            }
+        }
+    }
 
     private suspend fun collectTrackStats(event: RoomEvent.TrackSubscribed) {
         val pub = event.publication
@@ -209,36 +237,32 @@ class CallViewModel(
             mLog.setValue(EventLog("call_start_connect", callModel?.accessToken ?: "", 0))
             mConnectionStatus.setValue(ConnectionStatus("CONNECTING ..."))
             callModel?.accessToken?.let {
-                mLog.setValue(EventLog("call_connect_flow" ,"connect",0))
+                mLog.setValue(EventLog("call_connect_flow", "connect", 0))
                 room.connect(
                     url = callModel.websocket,
                     token = it,
                 )
-                mLog.setValue(EventLog("call_connect_flow", "connect",  1))
+                mLog.setValue(EventLog("call_connect_flow", "connect", 1))
                 val localParticipant = room.localParticipant
                 localParticipant.setMicrophoneEnabled(true)
                 mutableMicEnabled.postValue(localParticipant.isMicrophoneEnabled())
-                mLog.setValue(EventLog("call_connect_flow", "connect",  2))
+                mLog.setValue(EventLog("call_connect_flow", "connect", 2))
                 localParticipant.setCameraEnabled(true)
                 mutableCameraEnabled.postValue(localParticipant.isCameraEnabled())
-                mConnectionStatus.setValue(ConnectionStatus(""))
-                mLog.setValue(EventLog("call_connect_flow", "connect",  3))
+                mLog.setValue(EventLog("call_connect_flow", "connect", 3))
                 // Update the speaker
                 handlePrimarySpeaker(emptyList(), emptyList(), room)
-                mLog.setValue(EventLog("call_connect_flow", "connect",  4))
+                mLog.setValue(EventLog("call_connect_flow", "connect", 4))
             }
-            mLog.setValue(EventLog("call_connect_flow_end", "end",  0))
+            mLog.setValue(EventLog("call_connect_flow_end", "end", 0))
             Log.e("ROOM", "END_CONNECT")
         } catch (e: Throwable) {
             Log.e("ROOM", "CONNECT_ERROR>" + e.message)
-            mLog.setValue(EventLog("call_connect_error", e.message ?: "connect",  0))
+            mLog.setValue(EventLog("call_connect_error", e.message ?: "connect", 0))
             mutableError.value = e
             mAction.setValue(Action(Action.CLOSE_ACTIVITY));
         }
     }
-
-
-
 
 
     private fun handlePrimarySpeaker(
@@ -341,7 +365,7 @@ class CallViewModel(
     }
 
     fun cleanUp() {
-        mLog.setValue(EventLog("call_connect_clear",  "clear",  0))
+        mLog.setValue(EventLog("call_connect_clear", "clear", 0))
         room.localParticipant.cleanup()
         room.disconnect()
         room.release()
@@ -413,12 +437,12 @@ class CallViewModel(
 
     fun getShowRemarks(): Boolean {
 
-            return false;
+        return false;
 
     }
 
     fun reconnect() {
-        mLog.setValue(EventLog("call_reconnect",  "clear",  0))
+        mLog.setValue(EventLog("call_reconnect", "clear", 0))
         mutablePrimarySpeaker.value = null
         room.disconnect()
         viewModelScope.launch {
