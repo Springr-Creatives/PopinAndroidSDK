@@ -35,8 +35,12 @@ public class Popin {
     private SchedulePresenter schedulePresenter;
     private CallAcceptanceWaitHandler waitHandler;
     private static Popin popin;
-    private boolean disconnectButtonVisible = true;
-
+    private boolean hideDisconnectButton = false;
+    private boolean hideScreenShareButton = false;
+    private boolean hideFlipCameraButton = false;
+    private boolean hideMuteVideoButton = false;
+    private boolean hideMuteAudioButton = false;
+    private boolean hideBackButton = false;
 
     public static synchronized Popin init(Context context) {
         if (popin == null) {
@@ -121,8 +125,38 @@ public class Popin {
         }
     }
 
+    /**
+     * Toggle visibility of disconnect button
+     *
+     * @deprecated use {@link #setHideDisconnectButton()} instead.
+     */
+    @Deprecated
     public void setDisconnectButtonVisibility(boolean visible) {
-        disconnectButtonVisible = visible;
+        hideDisconnectButton = !visible;
+    }
+
+    public void setHideDisconnectButton(boolean hideDisconnectButton) {
+        this.hideDisconnectButton = hideDisconnectButton;
+    }
+
+    public void setHideScreenShareButton(boolean hideScreenShareButton) {
+        this.hideScreenShareButton = hideScreenShareButton;
+    }
+
+    public void setHideFlipCameraButton(boolean hideFlipCameraButton) {
+        this.hideFlipCameraButton = hideFlipCameraButton;
+    }
+
+    public void setHideMuteVideoButton(boolean hideMuteVideoButton) {
+        this.hideMuteVideoButton = hideMuteVideoButton;
+    }
+
+    public void setHideMuteAudioButton(boolean hideMuteAudioButton) {
+        this.hideMuteAudioButton = hideMuteAudioButton;
+    }
+
+    public void setHideBackButton(boolean hideBackButton) {
+        this.hideBackButton = hideBackButton;
     }
 
     public void startCall(PopinEventsListener popinEventsListener) {
@@ -180,10 +214,22 @@ public class Popin {
         connectionWorker.getCallDetails(call_id, new ConnectionWorker.CallDetailsListener() {
             @Override
             public void onCallDetails(FastCallModel fastCallModel) {
+                /*private boolean hideScreenShareButton = false;
+    private boolean hideFilpCameraButton = false;
+    private boolean hideMuteVideoButton = false;
+    private boolean hideMuteAudioButton = false;
+    private boolean hideBackButton = false;
+    */
+
                 popinEventsListener.onCallConnected();
                 Intent intent = new Intent(context, to.popin.androidsdk.call.CallActivity.class);
                 intent.putExtra("CALL", fastCallModel);
-                intent.putExtra("DISCONNECT_VISIBLE", disconnectButtonVisible);
+                intent.putExtra("HIDE_DISCONNECT_BUTTON", hideDisconnectButton);
+                intent.putExtra("HIDE_SCREEN_SHARE_BUTTON", hideScreenShareButton);
+                intent.putExtra("HIDE_FLIP_CAMERA_BUTTON", hideFlipCameraButton);
+                intent.putExtra("HIDE_MUTE_VIDEO_BUTTON", hideMuteVideoButton);
+                intent.putExtra("HIDE_MUTE_AUDIO_BUTTON", hideMuteAudioButton);
+                intent.putExtra("HIDE_BACK_BUTTON", hideBackButton);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }

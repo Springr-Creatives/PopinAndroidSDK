@@ -24,7 +24,13 @@ public class MainActivity extends AppCompatActivity {
         Button buttonInitialize = findViewById(R.id.buttonInitialize);
         buttonInitialize.setOnClickListener(view -> {
             Popin.init(MainActivity.this, "ashwin", "9876543217");
-            Popin.getInstance().setDisconnectButtonVisibility(false);
+            //Optional methods
+            Popin.getInstance().setHideDisconnectButton(false);
+            Popin.getInstance().setHideScreenShareButton(true);
+            Popin.getInstance().setHideFlipCameraButton(false);
+            Popin.getInstance().setHideMuteVideoButton(false);
+            Popin.getInstance().setHideMuteAudioButton(false);
+            Popin.getInstance().setHideBackButton(false);
         });
 
         Button buttonConnect = findViewById(R.id.buttonConnect);
