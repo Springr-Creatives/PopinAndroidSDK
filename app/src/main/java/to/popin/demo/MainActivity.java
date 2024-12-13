@@ -33,7 +33,10 @@ public class MainActivity extends AppCompatActivity {
             Popin.getInstance().setHideMuteAudioButton(false);
             Popin.getInstance().setHideBackButton(false);
         });
-
+        Button buttonInitializeNewName = findViewById(R.id.buttonInitializeNewName);
+        buttonInitializeNewName.setOnClickListener(view -> {
+            Popin.init(MainActivity.this, "ashwin_new", "9876543217");
+        });
         Button buttonConnect = findViewById(R.id.buttonConnect);
 
         buttonConnect.setOnClickListener(v -> Popin.getInstance().startCall(new PopinEventsListener() {

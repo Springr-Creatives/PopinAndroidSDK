@@ -52,6 +52,10 @@ public class Popin {
     public static synchronized Popin init(Context context, String userName, String contactInfo) {
         if (popin == null) {
             popin = new Popin(context, userName, contactInfo);
+        } else {
+            popin.popinSession.updateSession(() -> {
+                popin.connectionWorker = new ConnectionWorker(popin.popinSession.getContext(), popin.popinSession.getDevice());
+            });
         }
         return popin;
     }
