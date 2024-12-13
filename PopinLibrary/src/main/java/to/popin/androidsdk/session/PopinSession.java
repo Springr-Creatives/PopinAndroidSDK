@@ -19,9 +19,17 @@ public class PopinSession {
         this.popinSessionInteractor = new PopinSessionInteractor(context, device);
     }
 
-    public void updateSession(PopinSessionInteractor.RegistrationListener registrationListener) {
+    public void createSession(PopinSessionInteractor.RegistrationListener registrationListener) {
         if (!name.isEmpty()) {
             popinSessionInteractor.registerForToken(device.getSeller(), name, mobile, registrationListener);
+        } else {
+            registrationListener.onRegistered();
+        }
+    }
+
+    public void updateSession(String _name, String _mobile, PopinSessionInteractor.RegistrationListener registrationListener) {
+        if (!name.isEmpty()) {
+            popinSessionInteractor.registerForToken(device.getSeller(), _name, _mobile, registrationListener);
         } else {
             registrationListener.onRegistered();
         }

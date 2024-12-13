@@ -33,7 +33,7 @@ public class PopinSessionInteractor {
     }
 
     public void registerForToken(int seller, String name, String mobile, RegistrationListener registrationListener) {
-        Log.e("REGISTER", "T1");
+
         Call<UserModel> call = apiInterface.registerUser(seller, 1, myPhone.getDeviceName(), name, mobile);
         call.enqueue(new Callback<>() {
             @Override
@@ -41,14 +41,12 @@ public class PopinSessionInteractor {
                 if (response.code() == 200) {
                     UserModel userModel = response.body();
                     if (userModel != null && userModel.status == 1) {
-                        Log.e("REGISTER", "T2");
                         myPhone.saveToken(userModel.token);
                         myPhone.saveChannel(userModel.channel);
                         registrationListener.onRegistered();
                         return;
                     }
                 }
-                Log.e("POPIN", "TOKEN_END");
             }
 
             @Override

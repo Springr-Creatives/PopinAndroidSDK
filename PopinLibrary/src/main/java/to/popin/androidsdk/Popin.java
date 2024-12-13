@@ -53,7 +53,7 @@ public class Popin {
         if (popin == null) {
             popin = new Popin(context, userName, contactInfo);
         } else {
-            popin.popinSession.updateSession(() -> {
+            popin.popinSession.updateSession(userName, contactInfo, () -> {
                 popin.connectionWorker = new ConnectionWorker(popin.popinSession.getContext(), popin.popinSession.getDevice());
             });
         }
@@ -80,7 +80,7 @@ public class Popin {
             device.setSeller(apiKey);
             mainThreadBus = MainThreadBus.getInstance(); // Use the singleton instance
             popinSession = new PopinSession(context, device, name, mobile);
-            popinSession.updateSession(() -> {
+            popinSession.createSession(() -> {
                 connectionWorker = new ConnectionWorker(popinSession.getContext(), popinSession.getDevice());
             });
             schedulePresenter = new SchedulePresenter(new ScheduleInteractor(context, device));
@@ -127,11 +127,6 @@ public class Popin {
         }
     }
 
-    /**
-     * Toggle visibility of disconnect button
-     *
-     * @deprecated use {@link #setHideDisconnectButton()} instead.
-     */
     @Deprecated
     public void setDisconnectButtonVisibility(boolean visible) {
         hideDisconnectButton = !visible;

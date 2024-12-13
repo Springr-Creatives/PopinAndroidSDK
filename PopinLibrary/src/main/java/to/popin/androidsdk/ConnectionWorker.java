@@ -25,10 +25,16 @@ import to.popin.androidsdk.models.UserModel;
 public class ConnectionWorker {
 
     private final Device myPhone;
-    private final APIInterface apiInterface;
+    private final Context context;
+    private APIInterface apiInterface;
 
-    public ConnectionWorker(Context context , Device myPhone) {
+    public ConnectionWorker(Context context, Device myPhone) {
         this.myPhone = myPhone;
+        this.context = context;
+        loadApiClient(myPhone);
+    }
+
+    private void loadApiClient(Device myPhone) {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(new AuthInterceptor(myPhone));
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(context.getString(R.string.server_url) + "/api/")
@@ -38,10 +44,10 @@ public class ConnectionWorker {
         this.apiInterface = retrofit.create(APIInterface.class);
     }
 
-
     public void startConnection(final CreateConnectionListener createConnectionListener) {
+        loadApiClient(myPhone);
         final String uuid = UUID.randomUUID().toString();
-        Call<CreateConnectionModel> call = apiInterface.startConnection(myPhone.getSeller(),uuid);
+        Call<CreateConnectionModel> call = apiInterface.startConnection(myPhone.getSeller(), uuid);
         call.enqueue(new Callback<CreateConnectionModel>() {
             @Override
             public void onResponse(@NonNull Call<CreateConnectionModel> call, @NonNull Response<CreateConnectionModel> response) {
@@ -89,12 +95,14 @@ public class ConnectionWorker {
 
     interface CreateConnectionListener {
         void onConnectionStarted(int call_queue_id);
+
         void onConnectionFailed();
     }
 
 
     interface CallDetailsListener {
         void onCallDetails(FastCallModel fastCallModel);
+
         void onCallDetailsFail();
     }
 

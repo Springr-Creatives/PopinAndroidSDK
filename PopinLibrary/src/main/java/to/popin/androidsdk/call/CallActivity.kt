@@ -177,10 +177,9 @@ class CallActivity : AppCompatActivity() {
             }
         }
 
-        Log.e("ADA", "1")
+
         // Controls setup
         viewModel.cameraEnabled.observe(this) { enabled ->
-            Log.e("ADA", "2")
             logEvent("call_camera_enabled", "enabled", if (enabled) 1 else 0)
             binding.camera.setOnClickListener { viewModel.setCameraEnabled(!enabled) }
             binding.camera.setImageResource(
@@ -258,7 +257,6 @@ class CallActivity : AppCompatActivity() {
         val back = this.onBackPressedDispatcher
         back.addCallback(this, object : OnBackPressedCallback(true){
             override fun handleOnBackPressed() {
-                Log.e("AD","3")
                 enterPip();
             }
         })
