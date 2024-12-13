@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
         Button buttonInitialize = findViewById(R.id.buttonInitialize);
         buttonInitialize.setOnClickListener(view -> {
             Popin.init(MainActivity.this, "ashwin", "9876543217");
@@ -35,49 +36,43 @@ public class MainActivity extends AppCompatActivity {
 
         Button buttonConnect = findViewById(R.id.buttonConnect);
 
-        buttonConnect.setOnClickListener(new View.OnClickListener() {
+        buttonConnect.setOnClickListener(v -> Popin.getInstance().startCall(new PopinEventsListener() {
+            @Override
+            public void onCallStart() {
+                Log.e("POPIN", "CALL_START");
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_START", Toast.LENGTH_SHORT).show());
+            }
 
             @Override
-            public void onClick(View v) {
-                Popin.getInstance().startCall(new PopinEventsListener() {
-                    @Override
-                    public void onCallStart() {
-                        Log.e("POPIN", "CALL_START");
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_START", Toast.LENGTH_SHORT).show());
-                    }
-
-                    @Override
-                    public void onQueuePositionChanged(int position) {
-                        Log.e("POPIN", "QUEUE POSITION >" + position);
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "QUEUE POSITION >" + position, Toast.LENGTH_SHORT).show());
-                    }
-
-                    @Override
-                    public void onAllExpertsBusy() {
-                        Log.e("POPIN", "EXPERT BUSY");
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "EXPERT BUSY", Toast.LENGTH_SHORT).show());
-                    }
-
-                    @Override
-                    public void onCallConnected() {
-                        Log.e("POPIN", "CALL_CONNECTED");
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_CONNECTED", Toast.LENGTH_SHORT).show());
-                    }
-
-                    @Override
-                    public void onCallFailed() {
-                        Log.e("POPIN", "CALL_FAILED");
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_FAILED", Toast.LENGTH_SHORT).show());
-                    }
-
-                    @Override
-                    public void onCallDisconnected() {
-                        Log.e("POPIN", "CALL_DISCONNECTED");
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_DISCONNECTED", Toast.LENGTH_SHORT).show());
-                    }
-                });
+            public void onQueuePositionChanged(int position) {
+                Log.e("POPIN", "QUEUE POSITION >" + position);
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "QUEUE POSITION >" + position, Toast.LENGTH_SHORT).show());
             }
-        });
+
+            @Override
+            public void onAllExpertsBusy() {
+                Log.e("POPIN", "EXPERT BUSY");
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "EXPERT BUSY", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onCallConnected() {
+                Log.e("POPIN", "CALL_CONNECTED");
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_CONNECTED", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onCallFailed() {
+                Log.e("POPIN", "CALL_FAILED");
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_FAILED", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onCallDisconnected() {
+                Log.e("POPIN", "CALL_DISCONNECTED");
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "CALL_DISCONNECTED", Toast.LENGTH_SHORT).show());
+            }
+        }));
 
 
         Button buttonSchedule = findViewById(R.id.buttonSchedule);

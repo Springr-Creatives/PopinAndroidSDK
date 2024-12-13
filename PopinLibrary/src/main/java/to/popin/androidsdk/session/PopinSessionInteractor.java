@@ -33,7 +33,7 @@ public class PopinSessionInteractor {
     }
 
     public void registerForToken(int seller, String name, String mobile, RegistrationListener registrationListener) {
-        Call<UserModel> call = apiInterface.registerUser(seller, 1, "Test Device", name, mobile);
+        Call<UserModel> call = apiInterface.registerUser(seller, 1, myPhone.getDeviceName(), name, mobile);
         call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<UserModel> call, @NonNull Response<UserModel> response) {

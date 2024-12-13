@@ -59,7 +59,6 @@ public class CallAcceptanceWaitHandler extends Handler {
         @Override
         public void run() {
             if (isRunning && elapsedTime < MAX_DURATION) {
-                Log.e("RUNNING","QUEUE");
                 Call<UpdateConnectionModel> call = apiInterface.getCallUpdate(callQueueId);
                 call.enqueue(new retrofit2.Callback<>() {
                     @Override

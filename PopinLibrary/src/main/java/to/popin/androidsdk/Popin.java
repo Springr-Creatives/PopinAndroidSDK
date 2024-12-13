@@ -72,16 +72,14 @@ public class Popin {
             Device device = new Device(context);
             ApplicationInfo applicationInfo = context.getPackageManager()
                     .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-            if (applicationInfo != null) {
-                int apiKey = applicationInfo.metaData.getInt("to.popin.androidsdk.POPIN_TOKEN");
-                device.setSeller(apiKey);
-                mainThreadBus = MainThreadBus.getInstance(); // Use the singleton instance
-                popinSession = new PopinSession(context, device, name, mobile);
-                popinSession.updateSession(() -> {
-                    connectionWorker = new ConnectionWorker(popinSession.getContext(), popinSession.getDevice());
-                });
-                schedulePresenter = new SchedulePresenter(new ScheduleInteractor(context, device));
-            }
+            int apiKey = applicationInfo.metaData.getInt("to.popin.androidsdk.POPIN_TOKEN");
+            device.setSeller(apiKey);
+            mainThreadBus = MainThreadBus.getInstance(); // Use the singleton instance
+            popinSession = new PopinSession(context, device, name, mobile);
+            popinSession.updateSession(() -> {
+                connectionWorker = new ConnectionWorker(popinSession.getContext(), popinSession.getDevice());
+            });
+            schedulePresenter = new SchedulePresenter(new ScheduleInteractor(context, device));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 Dexter.withContext(context)
                         .withPermissions(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.BLUETOOTH_CONNECT)

@@ -20,7 +20,7 @@ public class PopinSession {
     }
 
     public void updateSession(PopinSessionInteractor.RegistrationListener registrationListener) {
-        if (device.getToken().length() == 0) {
+        if (!name.isEmpty()) {
             popinSessionInteractor.registerForToken(device.getSeller(), name, mobile, registrationListener);
         } else {
             registrationListener.onRegistered();
