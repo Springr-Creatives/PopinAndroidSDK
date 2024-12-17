@@ -122,8 +122,9 @@ public class Popin {
     public void cancelCall() {
         try {
             waitHandler.stopWaitingForAcceptance();
+            connectionWorker.closeConnection();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 

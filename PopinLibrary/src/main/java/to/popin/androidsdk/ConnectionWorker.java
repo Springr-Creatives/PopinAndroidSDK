@@ -27,6 +27,7 @@ public class ConnectionWorker {
     private final Device myPhone;
     private final Context context;
     private APIInterface apiInterface;
+    private String currentSession;
 
     public ConnectionWorker(Context context, Device myPhone) {
         this.myPhone = myPhone;
@@ -47,8 +48,9 @@ public class ConnectionWorker {
     public void startConnection(final CreateConnectionListener createConnectionListener) {
         loadApiClient(myPhone);
         final String uuid = UUID.randomUUID().toString();
+        currentSession = uuid;
         Call<CreateConnectionModel> call = apiInterface.startConnection(myPhone.getSeller(), uuid);
-        call.enqueue(new Callback<CreateConnectionModel>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<CreateConnectionModel> call, @NonNull Response<CreateConnectionModel> response) {
                 if (response.code() == 200) {
@@ -65,6 +67,26 @@ public class ConnectionWorker {
             public void onFailure(@NonNull Call<CreateConnectionModel> call, @NonNull Throwable t) {
                 Log.e("ERR", t.getMessage());
                 createConnectionListener.onConnectionFailed();
+            }
+        });
+    }
+
+    public void closeConnection() {
+        Call<StatusModel> call = apiInterface.closeConnection(currentSession);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<StatusModel> call, @NonNull Response<StatusModel> response) {
+                if (response.code() == 200) {
+                    StatusModel statusModel = response.body();
+                    if (statusModel != null && statusModel.status == 1) {
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<StatusModel> call, @NonNull Throwable t) {
+                Log.e("ERR", t.getMessage());
             }
         });
     }

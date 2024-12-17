@@ -54,4 +54,10 @@ public interface APIInterface {
     Call<UpdateConnectionModel> getCallUpdate(
             @Field("call_queue_id") int call_queue_id
     );
+
+    @FormUrlEncoded
+    @POST("/v1/user/screen/close")
+    Call<StatusModel> closeConnection(
+            @Field("session") String session
+    );
 }
