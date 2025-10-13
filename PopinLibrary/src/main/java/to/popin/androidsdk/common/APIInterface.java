@@ -60,4 +60,11 @@ public interface APIInterface {
     Call<StatusModel> closeConnection(
             @Field("session") String session
     );
+
+    @FormUrlEncoded
+    @POST("v1/external/join")
+    Call<FastCallModel> joinConferenceDetails(
+            @Field("agent_id") int agent_id,
+            @Field("slug") String slug
+    );
 }

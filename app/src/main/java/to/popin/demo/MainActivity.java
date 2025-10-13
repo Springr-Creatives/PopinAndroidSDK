@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.List;
 
 import to.popin.androidsdk.Popin;
+import to.popin.androidsdk.PopinConferenceEventListener;
 import to.popin.androidsdk.PopinEventsListener;
 import to.popin.androidsdk.PopinScheduleListener;
 import to.popin.androidsdk.models.ScheduleSlotsModel;
@@ -92,6 +93,25 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onScheduleLoadError() {
 
+                    }
+                });
+            }
+        });
+
+        Button buttonConference = findViewById(R.id.buttonConference);
+        buttonConference.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Popin.init(MainActivity.this, "ashwin", "9876543217");
+                Popin.getInstance().startConference(12973, "465c-1a61", "557305ad2bd531ddf9e50d75daed5947d79eb81a", new PopinConferenceEventListener() {
+                    @Override
+                    public void onConferenceJoined() {
+                        Log.e("CONF","JOINED");
+                    }
+
+                    @Override
+                    public void onConferenceFailed() {
+                        Log.e("CONF","FAILED");
                     }
                 });
             }

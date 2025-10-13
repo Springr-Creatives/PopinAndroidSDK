@@ -35,6 +35,7 @@ public class ConnectionWorker {
         loadApiClient(myPhone);
     }
 
+
     private void loadApiClient(Device myPhone) {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder().addInterceptor(new AuthInterceptor(myPhone));
         Retrofit retrofit = new Retrofit.Builder()

@@ -30,6 +30,8 @@ public class Popin {
     private Context context;
     private PopinSession popinSession;
     private ConnectionWorker connectionWorker;
+
+    private ConferenceWorker conferenceWorker;
     private PopinEventsListener popinEventsListener;
     private MainThreadBus mainThreadBus;
     private SchedulePresenter schedulePresenter;
@@ -82,6 +84,7 @@ public class Popin {
             popinSession = new PopinSession(context, device, name, mobile);
             popinSession.createSession(() -> {
                 connectionWorker = new ConnectionWorker(popinSession.getContext(), popinSession.getDevice());
+                conferenceWorker = new ConferenceWorker(popinSession.getContext(),popinSession.getDevice());
             });
             schedulePresenter = new SchedulePresenter(new ScheduleInteractor(context, device));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -157,6 +160,29 @@ public class Popin {
         this.hideBackButton = hideBackButton;
     }
 
+    public void startConference(int agentID, String slug, String xApiKey,PopinConferenceEventListener popinConferenceEventListener) {
+        conferenceWorker.joinConference(slug, agentID, xApiKey, new ConferenceWorker.ConferenceJoinListener() {
+            @Override
+            public void onConferenceJoined(FastCallModel fastCallModel) {
+                popinConferenceEventListener.onConferenceJoined();
+                Intent intent = new Intent(context, to.popin.androidsdk.call.CallActivity.class);
+                intent.putExtra("CALL", fastCallModel);
+                intent.putExtra("HIDE_DISCONNECT_BUTTON", hideDisconnectButton);
+                intent.putExtra("HIDE_SCREEN_SHARE_BUTTON", hideScreenShareButton);
+                intent.putExtra("HIDE_FLIP_CAMERA_BUTTON", hideFlipCameraButton);
+                intent.putExtra("HIDE_MUTE_VIDEO_BUTTON", hideMuteVideoButton);
+                intent.putExtra("HIDE_MUTE_AUDIO_BUTTON", hideMuteAudioButton);
+                intent.putExtra("HIDE_BACK_BUTTON", hideBackButton);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }
+
+            @Override
+            public void onConferenceJoinFailed() {
+                popinConferenceEventListener.onConferenceFailed();
+            }
+        });
+    }
     public void startCall(PopinEventsListener popinEventsListener) {
         this.popinEventsListener = popinEventsListener;
         connectionWorker.startConnection(new ConnectionWorker.CreateConnectionListener() {
