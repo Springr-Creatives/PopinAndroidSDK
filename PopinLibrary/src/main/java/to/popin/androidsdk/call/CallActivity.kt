@@ -281,7 +281,7 @@ class CallActivity : AppCompatActivity() {
                 if (connectionStatus.status.length == 0) {
                     binding.textConnecting.visibility = View.GONE
                 } else {
-                    binding.textConnecting.visibility = View.VISIBLE
+                    binding.textConnecting.visibility = View.GONE
                 }
             }
         }

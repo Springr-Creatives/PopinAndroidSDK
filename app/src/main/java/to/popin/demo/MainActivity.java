@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Popin.init(MainActivity.this, "ashwin", "9876543217");
-                Popin.getInstance().startConference(12973, "465c-1a61", "557305ad2bd531ddf9e50d75daed5947d79eb81a", new PopinConferenceEventListener() {
+                Popin.getInstance().startConference(12973, "f470-6656", "557305ad2bd531ddf9e50d75daed5947d79eb81a", new PopinConferenceEventListener() {
                     @Override
                     public void onConferenceJoined() {
                         Log.e("CONF","JOINED");
