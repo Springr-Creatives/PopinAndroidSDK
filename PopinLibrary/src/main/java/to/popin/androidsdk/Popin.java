@@ -26,10 +26,6 @@ import to.popin.androidsdk.schedule.ScheduleInteractor;
 import to.popin.androidsdk.schedule.SchedulePresenter;
 import to.popin.androidsdk.session.PopinSession;
 
-public interface PopinInitListener {
-    void onInitComplete();
-}
-
 public class Popin {
     private Context context;
     private PopinSession popinSession;
