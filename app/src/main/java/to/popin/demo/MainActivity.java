@@ -13,6 +13,7 @@ import java.util.List;
 import to.popin.androidsdk.Popin;
 import to.popin.androidsdk.PopinConferenceEventListener;
 import to.popin.androidsdk.PopinEventsListener;
+import to.popin.androidsdk.PopinInitListener;
 import to.popin.androidsdk.PopinScheduleListener;
 import to.popin.androidsdk.models.ScheduleSlotsModel;
 
@@ -102,16 +103,20 @@ public class MainActivity extends AppCompatActivity {
         buttonConference.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Popin.init(MainActivity.this, "ashwin", "9876543217");
-                Popin.getInstance().startConference(12973, "f470-6656", "557305ad2bd531ddf9e50d75daed5947d79eb81a", new PopinConferenceEventListener() {
+                Popin.init(MainActivity.this, "ashwin", "9876543217", new PopinInitListener() {
                     @Override
-                    public void onConferenceJoined() {
-                        Log.e("CONF","JOINED");
-                    }
+                    public void onInitComplete() {
+                        Popin.getInstance().startConference(12973, "f470-6656", "557305ad2bd531ddf9e50d75daed5947d79eb81a", new PopinConferenceEventListener() {
+                            @Override
+                            public void onConferenceJoined() {
+                                Log.e("CONF","JOINED");
+                            }
 
-                    @Override
-                    public void onConferenceFailed() {
-                        Log.e("CONF","FAILED");
+                            @Override
+                            public void onConferenceFailed() {
+                                Log.e("CONF","FAILED");
+                            }
+                        });
                     }
                 });
             }

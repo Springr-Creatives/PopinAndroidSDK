@@ -26,6 +26,10 @@ import to.popin.androidsdk.schedule.ScheduleInteractor;
 import to.popin.androidsdk.schedule.SchedulePresenter;
 import to.popin.androidsdk.session.PopinSession;
 
+public interface PopinInitListener {
+    void onInitComplete();
+}
+
 public class Popin {
     private Context context;
     private PopinSession popinSession;
@@ -62,6 +66,20 @@ public class Popin {
         return popin;
     }
 
+    public static synchronized Popin init(Context context, String userName, String contactInfo, PopinInitListener initListener) {
+        if (popin == null) {
+            popin = new Popin(context, userName, contactInfo, initListener);
+        } else {
+            popin.popinSession.updateSession(userName, contactInfo, () -> {
+                popin.connectionWorker = new ConnectionWorker(popin.popinSession.getContext(), popin.popinSession.getDevice());
+                if (initListener != null) {
+                    initListener.onInitComplete();
+                }
+            });
+        }
+        return popin;
+    }
+
     public static Popin getInstance() {
         if (popin == null) {
             Log.e("Exception", "PopinSDK Not Initialised");
@@ -72,6 +90,10 @@ public class Popin {
 
 
     public Popin(Context context, String name, String mobile) {
+        this(context, name, mobile, null);
+    }
+
+    public Popin(Context context, String name, String mobile, PopinInitListener initListener) {
         try {
             Log.e("PACKAGE", "INITIALISATION");
             this.context = context;
@@ -85,6 +107,9 @@ public class Popin {
             popinSession.createSession(() -> {
                 connectionWorker = new ConnectionWorker(popinSession.getContext(), popinSession.getDevice());
                 conferenceWorker = new ConferenceWorker(popinSession.getContext(),popinSession.getDevice());
+                if (initListener != null) {
+                    initListener.onInitComplete();
+                }
             });
             schedulePresenter = new SchedulePresenter(new ScheduleInteractor(context, device));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
