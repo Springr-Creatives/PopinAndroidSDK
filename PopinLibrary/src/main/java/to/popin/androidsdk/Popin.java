@@ -102,7 +102,7 @@ public class Popin {
             popinSession = new PopinSession(context, device, name, mobile);
             popinSession.createSession(() -> {
                 connectionWorker = new ConnectionWorker(popinSession.getContext(), popinSession.getDevice());
-                conferenceWorker = new ConferenceWorker(popinSession.getContext(),popinSession.getDevice());
+                conferenceWorker = new ConferenceWorker(popinSession.getContext(), popinSession.getDevice());
                 if (initListener != null) {
                     initListener.onInitComplete();
                 }
@@ -181,7 +181,7 @@ public class Popin {
         this.hideBackButton = hideBackButton;
     }
 
-    public void startConference(int agentID, String slug, String xApiKey,PopinConferenceEventListener popinConferenceEventListener) {
+    public void startConference(int agentID, String slug, String xApiKey, PopinConferenceEventListener popinConferenceEventListener) {
         conferenceWorker.joinConference(slug, agentID, xApiKey, new ConferenceWorker.ConferenceJoinListener() {
             @Override
             public void onConferenceJoined(FastCallModel fastCallModel) {
@@ -204,17 +204,22 @@ public class Popin {
             }
         });
     }
+
     public void startCall(PopinEventsListener popinEventsListener) {
         this.popinEventsListener = popinEventsListener;
         connectionWorker.startConnection(new ConnectionWorker.CreateConnectionListener() {
             @Override
             public void onConnectionStarted(int call_queue_id) {
-                popinEventsListener.onCallStart();
+                if (popinEventsListener != null) {
+                    popinEventsListener.onCallStart();
+                }
 
                 waitHandler = new CallAcceptanceWaitHandler(context, popin.popinSession.getDevice(), Looper.getMainLooper(), call_queue_id, new CallAcceptanceWaitHandler.CallAcceptanceListener() {
                     @Override
                     public void onQueuePositionChange(int position) {
-                        popinEventsListener.onQueuePositionChanged(position);
+                        if (popinEventsListener != null) {
+                            popinEventsListener.onQueuePositionChanged(position);
+                        }
                     }
 
                     @Override
@@ -224,7 +229,9 @@ public class Popin {
 
                     @Override
                     public void onExpertBusy() {
-                        popinEventsListener.onAllExpertsBusy();
+                        if (popinEventsListener != null) {
+                            popinEventsListener.onAllExpertsBusy();
+                        }
                     }
                 });
                 waitHandler.startWaitingForAcceptance();
@@ -232,14 +239,18 @@ public class Popin {
 
             @Override
             public void onConnectionFailed() {
-                popinEventsListener.onCallFailed();
+                if (popinEventsListener != null) {
+                    popinEventsListener.onCallFailed();
+                }
             }
         });
     }
 
     @Subscribe
     public void onCallEnd(CallCancelEvent callCancelEvent) {
-        popinEventsListener.onCallDisconnected();
+        if (popinEventsListener != null) {
+            popinEventsListener.onCallDisconnected();
+        }
     }
 
 
@@ -265,8 +276,9 @@ public class Popin {
     private boolean hideMuteAudioButton = false;
     private boolean hideBackButton = false;
     */
-
-                popinEventsListener.onCallConnected();
+                if (popinEventsListener != null) {
+                    popinEventsListener.onCallConnected();
+                }
                 Intent intent = new Intent(context, to.popin.androidsdk.call.CallActivity.class);
                 intent.putExtra("CALL", fastCallModel);
                 intent.putExtra("HIDE_DISCONNECT_BUTTON", hideDisconnectButton);
@@ -281,7 +293,9 @@ public class Popin {
 
             @Override
             public void onCallDetailsFail() {
-                popinEventsListener.onCallFailed();
+                if (popinEventsListener != null) {
+                    popinEventsListener.onCallFailed();
+                }
             }
         });
 
